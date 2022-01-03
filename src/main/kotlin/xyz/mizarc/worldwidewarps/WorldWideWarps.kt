@@ -1,11 +1,13 @@
 package xyz.mizarc.worldwidewarps
 
 import co.aikar.commands.PaperCommandManager
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.mizarc.worldwidewarps.commands.HomeCommand
 
 class WorldWideWarps: JavaPlugin() {
     private lateinit var commandManager: PaperCommandManager
+    val playerContainer = PlayerContainer()
 
     override fun onEnable() {
         commandManager = PaperCommandManager(this)
