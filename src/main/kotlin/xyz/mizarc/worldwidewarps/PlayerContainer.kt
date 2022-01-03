@@ -15,4 +15,24 @@ class PlayerContainer() {
 
         return null
     }
+
+    fun addPlayer(playerState: PlayerState) : Boolean {
+        for (existingPlayerState in playerStates) {
+            if (existingPlayerState.player.uniqueId == playerState.player.uniqueId) {
+                return false
+            }
+        }
+        playerStates.add(playerState)
+        return true
+    }
+
+    fun removePlayer(playerId: UUID) : Boolean {
+        for (playerState in playerStates) {
+            if (playerState.player.uniqueId == playerId) {
+                playerStates.remove(playerState)
+                return true
+            }
+        }
+        return false
+    }
 }
