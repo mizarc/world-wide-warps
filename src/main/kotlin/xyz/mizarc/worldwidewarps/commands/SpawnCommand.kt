@@ -36,7 +36,8 @@ class SpawnCommand: BaseCommand() {
 
         // Instant teleport if player if bypassing the timer
         if (player.hasPermission("worldwidewarps.teleport.spawn.bypasstimer")) {
-            teleporter.teleport(player, spawnLocation, 0, TeleportMessage.HOME)
+            teleporter.teleport(player, spawnLocation, 0)
+            player.sendMessage("§aWelcome to spawn.")
             return
         }
 
