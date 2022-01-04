@@ -15,6 +15,15 @@ class TeleportCancelListener(val playerContainer: PlayerContainer): Listener {
         val teleportTask = playerState.teleportTask ?: return
         if (!playerState.teleportTask!!.isTeleporting()) return
 
+
+        // Do nothing if player hasn't moved position
+        val x = event.from.blockX == event.to!!.blockX
+        val y = event.from.blockY == event.to!!.blockY
+        val z = event.from.blockZ == event.to!!.blockZ
+        if (x && y && z) {
+            return
+        }
+
         teleportTask.cancelTask()
         event.player.sendMessage("You moved. Teleportation has been cancelled.")
     }
