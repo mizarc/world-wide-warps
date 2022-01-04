@@ -30,7 +30,8 @@ class HomeCommand: BaseCommand() {
 
         // Bypasses the cooldown timer if player has permission
         if (player.hasPermission("worldwidewarps.teleport.home.bypasstimer")) {
-            teleporter.teleport(player, bedSpawnLocation, 0, TeleportMessage.HOME)
+            teleporter.teleport(player, bedSpawnLocation, 0)
+            player.sendMessage("§aWelcome home.")
             return
         }
 
