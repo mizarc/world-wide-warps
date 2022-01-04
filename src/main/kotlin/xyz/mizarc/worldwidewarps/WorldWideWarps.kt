@@ -8,6 +8,7 @@ import xyz.mizarc.worldwidewarps.commands.HomeCommand
 import xyz.mizarc.worldwidewarps.commands.SetspawnCommand
 import xyz.mizarc.worldwidewarps.commands.SpawnCommand
 import xyz.mizarc.worldwidewarps.events.PlayerRegistrationListener
+import xyz.mizarc.worldwidewarps.events.TeleportCancelListener
 
 class WorldWideWarps: JavaPlugin() {
     private lateinit var commandManager: PaperCommandManager
@@ -43,5 +44,6 @@ class WorldWideWarps: JavaPlugin() {
 
     private fun registerEvents() {
         server.pluginManager.registerEvents(PlayerRegistrationListener(playerContainer), this)
+        server.pluginManager.registerEvents(TeleportCancelListener(playerContainer), this)
     }
 }

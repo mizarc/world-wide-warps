@@ -6,8 +6,8 @@ import org.bukkit.scheduler.BukkitTask
 
 class TeleportTask(var task: BukkitTask, var player: Player, var location: Location) {
 
-    fun isTeleporting() {
-        !task.isCancelled
+    fun isTeleporting(): Boolean {
+        return !task.isCancelled
     }
 
     fun cancelTask() {
