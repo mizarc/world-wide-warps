@@ -17,14 +17,14 @@ class TeleportCancelListener(val playerContainer: PlayerContainer): Listener {
 
 
         // Do nothing if player hasn't moved position
-        val x = event.from.blockX == event.to!!.blockX
-        val y = event.from.blockY == event.to!!.blockY
-        val z = event.from.blockZ == event.to!!.blockZ
-        if (x && y && z) {
+        val xPos = event.from.blockX == event.to!!.blockX
+        val yPos = event.from.blockY == event.to!!.blockY
+        val zPos = event.from.blockZ == event.to!!.blockZ
+        if (xPos && yPos && zPos) {
             return
         }
 
         teleportTask.cancelTask()
-        event.player.sendMessage("You moved. Teleportation has been cancelled.")
+        event.player.sendMessage("§cYou moved. Teleportation has been cancelled.")
     }
 }
