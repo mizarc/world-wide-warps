@@ -9,7 +9,7 @@ class TeleportCancelListener(val playerContainer: PlayerContainer): Listener {
 
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
-        val playerState = playerContainer.getPlayer(event.player.uniqueId) ?: return
+        val playerState = playerContainer.getPlayer(event.player) ?: return
 
         // Do nothing if player is not teleporting
         val teleportTask = playerState.teleportTask ?: return

@@ -1,14 +1,15 @@
 package xyz.mizarc.worldwidewarps
 
+import org.bukkit.entity.Player
 import java.util.*
 import kotlin.collections.ArrayList
 
 class PlayerContainer() {
     var playerStates: ArrayList<PlayerState> = ArrayList()
 
-    fun getPlayer(playerId: UUID) : PlayerState? {
+    fun getPlayer(player: Player) : PlayerState? {
         for (playerState in playerStates) {
-            if (playerState.player.uniqueId == playerId) {
+            if (playerState.player.uniqueId == player.uniqueId) {
                 return playerState
             }
         }
