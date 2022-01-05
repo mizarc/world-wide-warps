@@ -44,8 +44,8 @@ class WorldWideWarps: JavaPlugin() {
     }
 
     private fun registerEvents() {
-        server.pluginManager.registerEvents(PlayerRegistrationListener(playerContainer), this)
+        server.pluginManager.registerEvents(PlayerRegistrationListener(storage, playerContainer), this)
         server.pluginManager.registerEvents(TeleportCancelListener(playerContainer), this)
-        server.pluginManager.registerEvents(BedMenuListener(), this)
+        server.pluginManager.registerEvents(BedMenuListener(playerContainer), this)
     }
 }
