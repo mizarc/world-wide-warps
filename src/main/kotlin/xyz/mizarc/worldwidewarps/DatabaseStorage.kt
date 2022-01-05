@@ -3,9 +3,13 @@ package xyz.mizarc.worldwidewarps
 import co.aikar.idb.Database
 import co.aikar.idb.DatabaseOptions
 import co.aikar.idb.PooledDatabaseOptions
+import org.bukkit.DyeColor
 import org.bukkit.entity.Player
 import xyz.mizarc.solidclaims.claims.Position
+import xyz.mizarc.worldwidewarps.utils.BedColourConversion
 import java.sql.SQLException
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DatabaseStorage {
     private var connection: Database
@@ -23,9 +27,11 @@ class DatabaseStorage {
     fun getHomes(player: Player): ArrayList<Home> {
         val homes = ArrayList<Home>()
         return try {
-            val results = connection.getResults("SELECT * FROM homes WHERE playerId=?", player.uniqueId)
+            val results = connection.getResults("SELECT * FROM homes WHERE playerId=?;", player.uniqueId)
             for (result in results) {
-                homes.add(Home(result.get("id"), result.get("name"),
+                homes.add(Home(
+                    UUID.fromString(result.getString("id")), result.getString("name"),
+                    DyeColor.valueOf(result.getString("colour")),
                     Position(result.get("positionX"), result.get("positionY"), result.get("positionZ"))))
             }
             homes
@@ -42,9 +48,9 @@ class DatabaseStorage {
      */
     fun addHome(player: Player, home: Home): Boolean {
         return try {
-            connection.executeUpdate("INSERT INTO homes (id, name, playerId, positionX, positionY, positionZ) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)",
-                player.uniqueId, home.name, home.position.x, home.position.y, home.position.z)
+            connection.executeUpdate("INSERT INTO homes (id, playerId, name, colour, positionX, positionY, positionZ) " +
+                    "VALUES (?, ?, ?, ?, ?, ?);",
+                home.id, player.uniqueId, home.name, home.colour, home.position.x, home.position.y, home.position.z)
             true
         } catch (except: SQLException) {
             false
@@ -58,7 +64,7 @@ class DatabaseStorage {
      */
     fun removeHome(home: Home): Boolean {
         return try {
-            connection.executeUpdate("DELETE FROM homes WHERE id=?", home.id)
+            connection.executeUpdate("DELETE FROM homes WHERE id=?;", home.id)
             true
         } catch (except: SQLException) {
             false
@@ -71,8 +77,8 @@ class DatabaseStorage {
      */
     private fun createHomesDatabase(): Boolean {
         return try {
-            connection.executeUpdate("CREATE TABLE IF NOT EXISTS homes (id TEXT, playerId TEXT, " +
-                    "positionX INTEGER, positionY INTEGER, positionZ INTEGER)")
+            connection.executeUpdate("CREATE TABLE IF NOT EXISTS homes (id TEXT, playerId TEXT, name TEXT, " +
+                    "colour TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER);")
             true
         } catch (except: SQLException) {
             false
