@@ -75,9 +75,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         // Add bed menu item
         val firstPane = StaticPane(0, 0, 1, 1)
         val bedItem = ItemStack(bed.material).lore("${position.x}, ${position.y}, ${position.z}")
-        val guiItem = GuiItem(bedItem) {
-            homes.add(Home(Bukkit.getOfflinePlayer(player.uniqueId), gui.renameText,
-                bed.getColour(), world, position))}
+        val guiItem = GuiItem(bedItem) { guiEvent -> guiEvent.isCancelled = true }
         firstPane.addItem(guiItem, 0, 0)
         gui.firstItemComponent.addPane(firstPane)
 
