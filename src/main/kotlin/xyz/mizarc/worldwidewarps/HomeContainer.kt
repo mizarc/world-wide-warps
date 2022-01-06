@@ -21,7 +21,7 @@ class HomeContainer(private val database: Database) {
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Position(result.getInt("positionX"),
+                    Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
                         result.getInt("positionY"), result.getInt("positionZ"))))
             }
         }
@@ -38,13 +38,14 @@ class HomeContainer(private val database: Database) {
         }
 
         if (foundHomes.isEmpty()) {
-            val results = database.getResults("SELECT * FROM homes WHERE playerId=?;", playerState.player.uniqueId)
+            val results = database.getResults("SELECT * FROM homes WHERE playerId=?;",
+                playerState.player.uniqueId)
             for (result in results) {
                 foundHomes.add(Home(
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Position(result.getInt("positionX"),
+                    Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
                         result.getInt("positionY"), result.getInt("positionZ"))))
             }
         }
@@ -61,13 +62,14 @@ class HomeContainer(private val database: Database) {
         }
 
         if (foundHomes.isEmpty()) {
-            val results = database.getResults("SELECT * FROM homes WHERE position.x AND position.y AND position.z")
+            val results = database.getResults(
+                "SELECT * FROM homes WHERE position.x AND position.y AND position.z")
             for (result in results) {
                 foundHomes.add(Home(
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Position(result.getInt("positionX"),
+                    Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
                         result.getInt("positionY"), result.getInt("positionZ"))))
             }
         }
@@ -77,8 +79,8 @@ class HomeContainer(private val database: Database) {
 
     fun add(home: Home) {
         homes.add(home)
-        database.executeInsert("INSERT INTO homes (id, playerId, name, colour, positionX, positionY, positionZ) "
-                + "VALUES (?, ?, ?, ?, ?, ?);")
+        database.executeInsert("INSERT INTO homes (id, playerId, name, colour, world, " +
+                "positionX, positionY, positionZ) VALUES (?, ?, ?, ?, ?, ?, ?);")
     }
 
     fun update(home: Home) {
@@ -90,8 +92,8 @@ class HomeContainer(private val database: Database) {
             }
             return
         }
-        database.executeUpdate("UPDATE homes SET name=?, colour=?, positionX=?, positionY=?, positionZ=? "
-                + "WHERE id=?")
+        database.executeUpdate("UPDATE homes SET name=?, colour=?, world=?, " +
+                "positionX=?, positionY=?, positionZ=? WHERE id=?")
     }
 
     fun remove(home: Home) {
