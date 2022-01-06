@@ -48,7 +48,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         // Add existing homes to menu
         val playerHomes = homes.getByPlayer(playerState)
         if (playerHomes.isNotEmpty()) {
-            for (i in 0 .. playerHomes.count()) {
+            for (i in 0 until playerHomes.count()) {
                 val home = playerHomes[i]
                 val bedItem = ItemStack(home.colour.toBed())
                     .name(playerHomes[i].name)
