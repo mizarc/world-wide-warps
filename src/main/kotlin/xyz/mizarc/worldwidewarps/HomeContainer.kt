@@ -64,7 +64,8 @@ class HomeContainer(private val database: Database) {
 
         if (foundHomes.isEmpty()) {
             val results = database.getResults(
-                "SELECT * FROM homes WHERE position.x AND position.y AND position.z")
+                "SELECT * FROM homes WHERE positionX=? AND positionY=? AND positionZ=?",
+                position.x, position.y, position.z)
             for (result in results) {
                 foundHomes.add(Home(
                     UUID.fromString(result.getString("id")),
@@ -82,7 +83,9 @@ class HomeContainer(private val database: Database) {
     fun add(home: Home) {
         homes.add(home)
         database.executeInsert("INSERT INTO homes (id, playerId, name, colour, world, " +
-                "positionX, positionY, positionZ) VALUES (?, ?, ?, ?, ?, ?, ?);")
+                "positionX, positionY, positionZ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+            home.id, home.player.uniqueId, home.name, home.colour, home.world,
+            home.position.x, home.position.y, home.position.z)
     }
 
     fun update(home: Home) {
@@ -94,8 +97,10 @@ class HomeContainer(private val database: Database) {
             }
             return
         }
-        database.executeUpdate("UPDATE homes SET name=?, colour=?, world=?, " +
-                "positionX=?, positionY=?, positionZ=? WHERE id=?")
+        database.executeUpdate("UPDATE homes SET playerId=?, name=?, colour=?, world=?, " +
+                "positionX=?, positionY=?, positionZ=? WHERE id=?",
+            home.player.uniqueId, home.name, home.colour, home.world,
+            home.position.x, home.position.y, home.position.z, home.id)
     }
 
     fun remove(home: Home) {
