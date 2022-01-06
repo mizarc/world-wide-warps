@@ -3,7 +3,6 @@ package xyz.mizarc.worldwidewarps
 import co.aikar.idb.Database
 import org.bukkit.Bukkit
 import org.bukkit.DyeColor
-import xyz.mizarc.solidclaims.claims.Position
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -22,7 +21,8 @@ class HomeContainer(private val database: Database) {
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
                     Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
-                        result.getInt("positionY"), result.getInt("positionZ"))))
+                        result.getInt("positionY"), result.getInt("positionZ"))
+                ))
             }
         }
 
@@ -46,7 +46,8 @@ class HomeContainer(private val database: Database) {
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
                     Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
-                        result.getInt("positionY"), result.getInt("positionZ"))))
+                        result.getInt("positionY"), result.getInt("positionZ"))
+                ))
             }
         }
 
@@ -70,7 +71,8 @@ class HomeContainer(private val database: Database) {
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
                     Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
-                        result.getInt("positionY"), result.getInt("positionZ"))))
+                        result.getInt("positionY"), result.getInt("positionZ"))
+                ))
             }
         }
 
