@@ -12,7 +12,7 @@ import xyz.mizarc.worldwidewarps.events.TeleportCancelListener
 class WorldWideWarps: JavaPlugin() {
     private lateinit var commandManager: PaperCommandManager
     private val config = Config(this)
-    private val storage = DatabaseStorage()
+    private val storage = DatabaseStorage(this)
     val players = PlayerContainer()
     val homes = HomeContainer(storage.connection)
     val teleporter = Teleporter(this, players)
