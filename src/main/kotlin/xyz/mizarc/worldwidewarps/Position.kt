@@ -1,6 +1,7 @@
-package xyz.mizarc.solidclaims.claims
+package xyz.mizarc.worldwidewarps
 
 import org.bukkit.Location
+import org.bukkit.World
 
 /**
  * Stores three integers to define a position in the world.
@@ -10,4 +11,8 @@ import org.bukkit.Location
  */
 data class Position(val x: Int, val y: Int, val z: Int) {
     constructor(location: Location): this(location.blockX, location.blockY, location.blockZ)
+
+    fun toLocation(world: World): Location {
+        return Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+    }
 }
