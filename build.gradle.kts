@@ -36,12 +36,14 @@ dependencies {
     implementation("com.github.Gecolay:GSit:5f088cbe9d")
     implementation("co.aikar:idb-core:1.0.0-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:2.4.1")
+    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.4")
 }
 
 tasks.shadowJar {
     relocate("co.aikar.commands", "xyz.mizarc.worldwidewarps.acf")
     relocate("co.aikar.locales", "xyz.mizarc.worldwidewarps.locales")
     relocate("co.aikar.idb", "xyz.mizarc.worldwidewarps.idb")
+    relocate ("com.github.stefvanschie.inventoryframework", "xyz.mizarc.worldwidewarps.inventoryframework")
 }
 
 tasks.test {
