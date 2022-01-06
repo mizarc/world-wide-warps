@@ -13,9 +13,9 @@ class WorldWideWarps: JavaPlugin() {
     private lateinit var commandManager: PaperCommandManager
     private val config = Config(this)
     private val storage = DatabaseStorage()
-    val playerContainer = PlayerContainer(storage.connection)
-    val homeContainer = HomeContainer(storage.connection)
-    val teleporter = Teleporter(this, playerContainer)
+    val players = PlayerContainer()
+    val homes = HomeContainer(storage.connection)
+    val teleporter = Teleporter(this, players)
 
 
     override fun onEnable() {
@@ -34,7 +34,7 @@ class WorldWideWarps: JavaPlugin() {
     private fun registerDependencies() {
         commandManager.registerDependency(Config::class.java, config)
         commandManager.registerDependency(DatabaseStorage::class.java, storage)
-        commandManager.registerDependency(PlayerContainer::class.java, playerContainer)
+        commandManager.registerDependency(PlayerContainer::class.java, players)
         commandManager.registerDependency(Teleporter::class.java, teleporter)
     }
 
@@ -45,8 +45,8 @@ class WorldWideWarps: JavaPlugin() {
     }
 
     private fun registerEvents() {
-        server.pluginManager.registerEvents(PlayerRegistrationListener(storage, playerContainer), this)
-        server.pluginManager.registerEvents(TeleportCancelListener(playerContainer), this)
-        server.pluginManager.registerEvents(BedMenuListener(playerContainer), this)
+        server.pluginManager.registerEvents(PlayerRegistrationListener(homes, players), this)
+        server.pluginManager.registerEvents(TeleportCancelListener(players), this)
+        server.pluginManager.registerEvents(BedMenuListener(homes, players), this)
     }
 }
