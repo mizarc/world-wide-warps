@@ -94,7 +94,7 @@ class HomeContainer(private val database: Database) {
                 + "WHERE id=?")
     }
 
-    fun delete(home: Home) {
+    fun remove(home: Home) {
         homes.remove(home)
         database.executeUpdate("DELETE FROM homes WHERE id=?", home.id)
     }

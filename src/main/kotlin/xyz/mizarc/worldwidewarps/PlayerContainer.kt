@@ -4,10 +4,14 @@ import org.bukkit.entity.Player
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PlayerContainer() {
+class PlayerContainer {
     var playerStates: ArrayList<PlayerState> = ArrayList()
 
-    fun getPlayer(player: Player) : PlayerState? {
+    fun getAll(): ArrayList<PlayerState> {
+        return playerStates
+    }
+
+    fun getByPlayer(player: Player) : PlayerState? {
         for (playerState in playerStates) {
             if (playerState.player.uniqueId == player.uniqueId) {
                 return playerState
@@ -17,7 +21,7 @@ class PlayerContainer() {
         return null
     }
 
-    fun addPlayer(playerState: PlayerState) : Boolean {
+    fun add(playerState: PlayerState) : Boolean {
         for (existingPlayerState in playerStates) {
             if (existingPlayerState.player.uniqueId == playerState.player.uniqueId) {
                 return false
@@ -27,7 +31,7 @@ class PlayerContainer() {
         return true
     }
 
-    fun removePlayer(playerId: UUID) : Boolean {
+    fun remove(playerId: UUID) : Boolean {
         for (playerState in playerStates) {
             if (playerState.player.uniqueId == playerId) {
                 playerStates.remove(playerState)

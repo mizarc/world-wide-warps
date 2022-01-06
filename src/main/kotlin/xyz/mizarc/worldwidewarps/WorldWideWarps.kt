@@ -13,7 +13,8 @@ class WorldWideWarps: JavaPlugin() {
     private lateinit var commandManager: PaperCommandManager
     private val config = Config(this)
     private val storage = DatabaseStorage()
-    val playerContainer = PlayerContainer()
+    val playerContainer = PlayerContainer(storage.connection)
+    val homeContainer = HomeContainer(storage.connection)
     val teleporter = Teleporter(this, playerContainer)
 
 
