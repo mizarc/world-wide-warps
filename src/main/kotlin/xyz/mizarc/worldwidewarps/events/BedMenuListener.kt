@@ -112,7 +112,8 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         // Add confirm menu item.
         val secondPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
-        val confirmGuiItem = GuiItem(confirmItem) {
+        val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
+            guiEvent.isCancelled = true
             homes.add(Home(Bukkit.getOfflinePlayer(player.uniqueId), gui.renameText, bed.getColour(), world, position))
             openHomeSelectionMenu(player, world, position, bed)
         }
@@ -164,7 +165,8 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         // Add confirm menu item.
         val secondPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
-        val confirmGuiItem = GuiItem(confirmItem) {
+        val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
+            guiEvent.isCancelled = true
             val newHome = Home(home.id, Bukkit.getOfflinePlayer(player.uniqueId),
                 gui.renameText, bed.getColour(), world, position)
             homes.update(newHome)
