@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import org.apache.commons.lang.WordUtils
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.data.type.Bed
@@ -34,7 +35,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
 
         event.player.bedSpawnLocation = event.bed.location
         openHomeSelectionMenu(
-            event.player, event.bed.location.world!!, Position(event.player.bedSpawnLocation!!),
+            event.player, event.bed.location.world!!, Position(event.bed.location),
             event.bed.blockData as Bed)
         event.isCancelled = true
     }
