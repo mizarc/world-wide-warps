@@ -22,7 +22,7 @@ class DatabaseStorage(plugin: Plugin) {
     private fun createHomesDatabase(): Boolean {
         return try {
             connection.executeUpdate("CREATE TABLE IF NOT EXISTS homes (id TEXT, playerId TEXT, name TEXT, " +
-                    "colour TEXT, world TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER);")
+                    "colour TEXT, worldId TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER);")
             true
         } catch (except: SQLException) {
             false

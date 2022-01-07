@@ -16,12 +16,13 @@ class HomeContainer(private val database: Database) {
         if (foundHomes.isEmpty()) {
             val results = database.getResults("SELECT * FROM homes;")
             for (result in results) {
+                val world = Bukkit.getWorld(UUID.fromString(result.getString("worldId"))) ?: continue
                 foundHomes.add(Home(
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
-                    result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Bukkit.getWorld(result.getString("worldId"))!!, Position(result.getInt("positionX"),
-                        result.getInt("positionY"), result.getInt("positionZ"))
+                    result.getString("name"), DyeColor.valueOf(result.getString("colour")), world,
+                    Position(result.getInt("positionX"), result.getInt("positionY"),
+                        result.getInt("positionZ"))
                 ))
             }
         }
@@ -41,12 +42,13 @@ class HomeContainer(private val database: Database) {
             val results = database.getResults("SELECT * FROM homes WHERE playerId=?;",
                 playerState.player.uniqueId)
             for (result in results) {
+                val world = Bukkit.getWorld(UUID.fromString(result.getString("worldId"))) ?: continue
                 foundHomes.add(Home(
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
-                    result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Bukkit.getWorld(result.getString("worldId"))!!, Position(result.getInt("positionX"),
-                        result.getInt("positionY"), result.getInt("positionZ"))
+                    result.getString("name"), DyeColor.valueOf(result.getString("colour")), world,
+                    Position(result.getInt("positionX"), result.getInt("positionY"),
+                        result.getInt("positionZ"))
                 ))
             }
         }
@@ -67,12 +69,13 @@ class HomeContainer(private val database: Database) {
                 "SELECT * FROM homes WHERE positionX=? AND positionY=? AND positionZ=?",
                 position.x, position.y, position.z)
             for (result in results) {
+                val world = Bukkit.getWorld(UUID.fromString(result.getString("worldId"))) ?: continue
                 foundHomes.add(Home(
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
-                    result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Bukkit.getWorld(result.getString("worldId"))!!, Position(result.getInt("positionX"),
-                        result.getInt("positionY"), result.getInt("positionZ"))
+                    result.getString("name"), DyeColor.valueOf(result.getString("colour")), world,
+                    Position(result.getInt("positionX"), result.getInt("positionY"),
+                        result.getInt("positionZ"))
                 ))
             }
         }
