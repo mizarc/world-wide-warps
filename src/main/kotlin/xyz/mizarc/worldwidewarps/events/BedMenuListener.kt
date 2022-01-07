@@ -34,6 +34,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         openHomeSelectionMenu(
             event.player, event.bed.location.world!!, Position(event.player.bedSpawnLocation!!),
             event.bed.blockData as Bed)
+        event.isCancelled = true
     }
 
     private fun openHomeSelectionMenu(player: Player, world: World, position: Position, bed: Bed) {
@@ -43,7 +44,19 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         val gui = ChestGui(1, "Homes")
         val pane = StaticPane(0, 0, 9, 1)
         gui.addPane(pane)
-        var lastPaneEntry = -1
+        var lastPaneEntry = 1
+
+        // Add bed player is currently sleeping in
+        val currentBedItem = ItemStack(bed.material)
+            .name("Current Home")
+            .lore("You will respawn at this bed (${position.x} / ${position.y} / ${position.z})")
+        val guiCurrentBedItem = GuiItem(currentBedItem) { guiEvent -> guiEvent.isCancelled = true }
+        pane.addItem(guiCurrentBedItem, 0, 0)
+
+        val separator = ItemStack(Material.BLACK_STAINED_GLASS_PANE).name(" ")
+        val guisSeparator = GuiItem(separator) { guiEvent -> guiEvent.isCancelled = true }
+        pane.addItem(guisSeparator, 1, 0)
+
 
         // Add existing homes to menu
         val playerHomes = homes.getByPlayer(playerState)
@@ -54,8 +67,8 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
                     .name(playerHomes[i].name)
                     .lore("Teleports to bed at ${home.position.x}, ${home.position.y}, ${home.position.z}")
                 val guiBedItem = GuiItem(bedItem) { player.teleport(home.position.toLocation(home.world)) }
-                pane.addItem(guiBedItem, i, 0)
-                lastPaneEntry = i
+                pane.addItem(guiBedItem, i + 2, 0)
+                lastPaneEntry = i + 2
             }
         }
 
@@ -84,6 +97,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) {
             homes.add(Home(Bukkit.getOfflinePlayer(player.uniqueId), gui.renameText, bed.getColour(), world, position))
+            openHomeSelectionMenu(player, world, position, bed)
         }
         secondPane.addItem(confirmGuiItem, 0, 0)
         gui.resultComponent.addPane(secondPane)
