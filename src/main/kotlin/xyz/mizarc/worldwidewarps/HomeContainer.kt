@@ -20,7 +20,7 @@ class HomeContainer(private val database: Database) {
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
+                    Bukkit.getWorld(result.getString("worldId"))!!, Position(result.getInt("positionX"),
                         result.getInt("positionY"), result.getInt("positionZ"))
                 ))
             }
@@ -45,7 +45,7 @@ class HomeContainer(private val database: Database) {
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
+                    Bukkit.getWorld(result.getString("worldId"))!!, Position(result.getInt("positionX"),
                         result.getInt("positionY"), result.getInt("positionZ"))
                 ))
             }
@@ -71,7 +71,7 @@ class HomeContainer(private val database: Database) {
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")),
-                    Bukkit.getWorld(result.getString("world"))!!, Position(result.getInt("positionX"),
+                    Bukkit.getWorld(result.getString("worldId"))!!, Position(result.getInt("positionX"),
                         result.getInt("positionY"), result.getInt("positionZ"))
                 ))
             }
@@ -82,7 +82,7 @@ class HomeContainer(private val database: Database) {
 
     fun add(home: Home) {
         homes.add(home)
-        database.executeInsert("INSERT INTO homes (id, playerId, name, colour, world, " +
+        database.executeInsert("INSERT INTO homes (id, playerId, name, colour, worldId, " +
                 "positionX, positionY, positionZ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
             home.id, home.player.uniqueId, home.name, home.colour, home.world.uid,
             home.position.x, home.position.y, home.position.z)
