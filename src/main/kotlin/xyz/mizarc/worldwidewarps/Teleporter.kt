@@ -9,7 +9,7 @@ class Teleporter(val plugin: Plugin, val playerContainer: PlayerContainer) {
 
     fun teleport(player: Player, location: Location, timer: Int = 0,
                  teleportMessage: TeleportMessage = TeleportMessage.NONE): Boolean {
-        val playerState = playerContainer.getPlayer(player.uniqueId) ?: return false
+        val playerState = playerContainer.getByPlayer(player) ?: return false
         if (timer == 0) {
             player.teleport(location)
             return true
