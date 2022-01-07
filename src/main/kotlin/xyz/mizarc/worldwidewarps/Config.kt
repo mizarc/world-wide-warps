@@ -14,6 +14,7 @@ class Config(val plugin: Plugin) {
     var homeTimer = 0
     var homeCooldown = 0
     var inviteRange = 0
+    var homeLimit = 0
 
     init {
         createDefaultConfig()
@@ -28,6 +29,7 @@ class Config(val plugin: Plugin) {
         homeCooldown = configFile.getInt("home_cooldown")
         inviteRange = configFile.getInt("invite_range")
         spawnLocation = configFile.getString("spawn_location")!!
+        homeLimit = configFile.getInt("home_limit")
     }
 
     fun setSpawnLocation(location: Location) {
@@ -44,6 +46,7 @@ class Config(val plugin: Plugin) {
         plugin.config.addDefault("home_default_to_spawn", true)
         plugin.config.addDefault("home_timer", 5)
         plugin.config.addDefault("home_cooldown", 30)
+        plugin.config.addDefault("home_limit", 3)
         plugin.config.addDefault("invite_range", 20)
         plugin.config.addDefault("tpr_radius", 1000)
         plugin.config.addDefault("tpr_attempts", 50)
