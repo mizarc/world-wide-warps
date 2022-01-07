@@ -4,6 +4,7 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.gui.type.AnvilGui
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
+import org.apache.commons.lang.WordUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World
@@ -124,7 +125,10 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
 
     private fun openHomeEditMenu(player: Player, world: World, position: Position, bed: Bed, home: Home) {
         // Create edit menu
-        val gui = ChestGui(1, "Editing ${home.name}")
+        val name = home.name.ifEmpty {
+            WordUtils.capitalizeFully(home.colour.toBed().name.replace("_", " "))
+        }
+        val gui = ChestGui(1, "Editing $name")
         val pane = StaticPane(0, 0, 9, 1)
         gui.addPane(pane)
 
@@ -157,7 +161,9 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
 
         // Add bed menu item
         val firstPane = StaticPane(0, 0, 1, 1)
-        val bedItem = ItemStack(bed.material).lore("${position.x}, ${position.y}, ${position.z}")
+        val bedItem = ItemStack(
+            home.colour.toBed().createBlockData().material)
+            .lore("${home.position.x}, ${home.position.y}, ${home.position.z}")
         val guiItem = GuiItem(bedItem) { guiEvent -> guiEvent.isCancelled = true }
         firstPane.addItem(guiItem, 0, 0)
         gui.firstItemComponent.addPane(firstPane)
