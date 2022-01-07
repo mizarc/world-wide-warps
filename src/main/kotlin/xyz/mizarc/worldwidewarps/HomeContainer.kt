@@ -84,7 +84,7 @@ class HomeContainer(private val database: Database) {
         homes.add(home)
         database.executeInsert("INSERT INTO homes (id, playerId, name, colour, world, " +
                 "positionX, positionY, positionZ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-            home.id, home.player.uniqueId, home.world.uid, home.colour, home.world.uid,
+            home.id, home.player.uniqueId, home.name, home.colour, home.world.uid,
             home.position.x, home.position.y, home.position.z)
     }
 
