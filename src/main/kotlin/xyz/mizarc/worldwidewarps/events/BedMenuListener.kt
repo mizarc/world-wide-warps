@@ -11,6 +11,7 @@ import org.bukkit.block.data.type.Bed
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.inventory.ItemStack
 import xyz.mizarc.worldwidewarps.Position
@@ -65,8 +66,14 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
                 val home = playerHomes[i]
                 val bedItem = ItemStack(home.colour.toBed())
                     .name(playerHomes[i].name)
-                    .lore("Teleports to bed at ${home.position.x}, ${home.position.y}, ${home.position.z}")
-                val guiBedItem = GuiItem(bedItem) { player.teleport(home.position.toLocation(home.world)) }
+                    .lore("Teleports to bed at ${home.position.x}, ${home.position.y}, ${home.position.z}.")
+                    .lore("Right click to edit.")
+                val guiBedItem = GuiItem(bedItem) { guiEvent ->
+                    when (guiEvent.click) {
+                        ClickType.RIGHT -> openHomeEditMenu(player, world, position, bed, home)
+                        else -> player.teleport(home.position.toLocation(home.world))
+                    }
+                }
                 pane.addItem(guiBedItem, i + 2, 0)
                 lastPaneEntry = i + 2
             }
@@ -111,6 +118,61 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         }
         secondPane.addItem(confirmGuiItem, 0, 0)
         gui.resultComponent.addPane(secondPane)
+        gui.show(player)
+    }
+
+    private fun openHomeEditMenu(player: Player, world: World, position: Position, bed: Bed, home: Home) {
+        // Create edit menu
+        val gui = ChestGui(1, "Editing ${home.name}")
+        val pane = StaticPane(0, 0, 9, 1)
+        gui.addPane(pane)
+
+        // Add Edit button
+        val renameItem = ItemStack(Material.NAME_TAG)
+            .name("Rename Home")
+        val guiRenameItem = GuiItem(renameItem) { openHomeRenameMenu(player, world, position, bed, home) }
+        pane.addItem(guiRenameItem, 2, 0)
+
+        // Add Remove button
+        val removeItem = ItemStack(Material.REDSTONE)
+            .name("Delete Home")
+        val guiRemoveItem = GuiItem(removeItem) {
+            homes.remove(home)
+            openHomeSelectionMenu(player, world, position, bed)
+        }
+        pane.addItem(guiRemoveItem, 4, 0)
+
+        // Add Go Back button
+        val goBackItem = ItemStack(Material.NETHER_STAR)
+            .name("Go Back")
+        val guiGoBackItem = GuiItem(goBackItem) { openHomeSelectionMenu(player, world, position, bed) }
+        pane.addItem(guiGoBackItem, 6, 0)
+        gui.show(player)
+    }
+
+    private fun openHomeRenameMenu(player: Player, world: World, position: Position, bed: Bed, home: Home) {
+        // Create homes menu
+        val gui = AnvilGui("Renaming ${home.name}")
+
+        // Add bed menu item
+        val firstPane = StaticPane(0, 0, 1, 1)
+        val bedItem = ItemStack(bed.material).lore("${position.x}, ${position.y}, ${position.z}")
+        val guiItem = GuiItem(bedItem) { guiEvent -> guiEvent.isCancelled = true }
+        firstPane.addItem(guiItem, 0, 0)
+        gui.firstItemComponent.addPane(firstPane)
+
+        // Add confirm menu item.
+        val secondPane = StaticPane(0, 0, 1, 1)
+        val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
+        val confirmGuiItem = GuiItem(confirmItem) {
+            val newHome = Home(home.id, Bukkit.getOfflinePlayer(player.uniqueId),
+                gui.renameText, bed.getColour(), world, position)
+            homes.update(newHome)
+            openHomeEditMenu(player, world, position, bed, newHome)
+        }
+        secondPane.addItem(confirmGuiItem, 0, 0)
+        gui.resultComponent.addPane(secondPane)
+
         gui.show(player)
     }
 

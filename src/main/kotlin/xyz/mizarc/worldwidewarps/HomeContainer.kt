@@ -102,7 +102,7 @@ class HomeContainer(private val database: Database) {
             }
             return
         }
-        database.executeUpdate("UPDATE homes SET playerId=?, name=?, colour=?, world=?, " +
+        database.executeUpdate("UPDATE homes SET playerId=?, name=?, colour=?, worldId=?, " +
                 "positionX=?, positionY=?, positionZ=? WHERE id=?",
             home.player.uniqueId, home.name, home.colour, home.world,
             home.position.x, home.position.y, home.position.z, home.id)
