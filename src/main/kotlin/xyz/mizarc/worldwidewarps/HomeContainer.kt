@@ -6,7 +6,7 @@ import org.bukkit.DyeColor
 import java.util.*
 import kotlin.collections.ArrayList
 
-class HomeContainer(private val database: Database) {
+class HomeContainer(private val database: Database, private val players: PlayerContainer) {
     private val homes = ArrayList<Home>()
 
     fun getAll(): ArrayList<Home> {
@@ -94,18 +94,20 @@ class HomeContainer(private val database: Database) {
     }
 
     fun update(home: Home) {
-        for (storedHome in homes) {
+        for (storedHome in getByPlayer(players.getByPlayer(Bukkit.getPlayer(home.player.uniqueId)!!)!!)) {
+            println(storedHome.id)
+            println(home.id)
             if (storedHome.id == home.id) {
                 homes.remove(storedHome)
                 homes.add(home)
-                break
+
+                database.executeUpdate("UPDATE homes SET playerId=?, name=?, colour=?, worldId=?, " +
+                        "positionX=?, positionY=?, positionZ=? WHERE id=?",
+                    home.player.uniqueId, home.name, home.colour, home.world.uid,
+                    home.position.x, home.position.y, home.position.z, home.id)
+                return
             }
-            return
         }
-        database.executeUpdate("UPDATE homes SET playerId=?, name=?, colour=?, worldId=?, " +
-                "positionX=?, positionY=?, positionZ=? WHERE id=?",
-            home.player.uniqueId, home.name, home.colour, home.world.uid,
-            home.position.x, home.position.y, home.position.z, home.id)
     }
 
     fun remove(home: Home) {
