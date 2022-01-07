@@ -1,19 +1,18 @@
 package xyz.mizarc.worldwidewarps.events
 
+import net.milkbowl.vault.chat.Chat
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import xyz.mizarc.worldwidewarps.DatabaseStorage
-import xyz.mizarc.worldwidewarps.HomeContainer
-import xyz.mizarc.worldwidewarps.PlayerContainer
-import xyz.mizarc.worldwidewarps.PlayerState
+import xyz.mizarc.worldwidewarps.*
 
-class PlayerRegistrationListener(val homes: HomeContainer, val players: PlayerContainer): Listener {
+class PlayerRegistrationListener(val homes: HomeContainer, val players: PlayerContainer,
+                                 val config: Config, val metadata: Chat): Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        val playerState = PlayerState(event.player)
+        val playerState = PlayerState(event.player, config, metadata)
         players.add(playerState)
     }
 

@@ -21,7 +21,6 @@ class WorldWideWarps: JavaPlugin() {
     val homes = HomeContainer(storage.connection, players)
     val teleporter = Teleporter(this, players)
 
-
     override fun onEnable() {
         val serviceProvider: RegisteredServiceProvider<Chat> = server.servicesManager.getRegistration(Chat::class.java)!!
         metadata = serviceProvider.provider
