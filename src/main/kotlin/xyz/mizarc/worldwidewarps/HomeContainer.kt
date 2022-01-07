@@ -43,13 +43,15 @@ class HomeContainer(private val database: Database) {
                 playerState.player.uniqueId)
             for (result in results) {
                 val world = Bukkit.getWorld(UUID.fromString(result.getString("worldId"))) ?: continue
-                foundHomes.add(Home(
+                val home = Home(
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")), world,
                     Position(result.getInt("positionX"), result.getInt("positionY"),
-                        result.getInt("positionZ"))
+                        result.getInt("positionZ")
                 ))
+                foundHomes.add(home)
+                homes.add(home)
             }
         }
 

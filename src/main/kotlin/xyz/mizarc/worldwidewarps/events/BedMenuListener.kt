@@ -72,11 +72,21 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
             }
         }
 
+        // Sets new home item based on home state
+        val guiItem = if (isHomeAlreadySet(player, position)) {
+            val newBedItem = ItemStack(Material.MAGMA_CREAM)
+                .name("Home already set")
+                .lore("You cannot set an already saved home.")
+            GuiItem(newBedItem) { guiEvent -> guiEvent.isCancelled = true }
+        }
+        else {
+            val newBedItem = ItemStack(Material.NETHER_STAR)
+                .name("Add new home")
+                .lore("Sets your current bed as a saved home.")
+            GuiItem(newBedItem) { openHomeCreationMenu(player, world, position, bed) }
+        }
+
         // Add new home item to menu
-        val newBedItem = ItemStack(Material.NETHER_STAR)
-            .name("Add new home")
-            .lore("Sets your current bed as a saved home.")
-        val guiItem = GuiItem(newBedItem) { openHomeCreationMenu(player, world, position, bed) }
         pane.addItem(guiItem, lastPaneEntry + 1, 0)
         gui.show(player)
     }
@@ -102,6 +112,15 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         secondPane.addItem(confirmGuiItem, 0, 0)
         gui.resultComponent.addPane(secondPane)
         gui.show(player)
+    }
 
+    private fun isHomeAlreadySet(player: Player, position: Position): Boolean {
+        val playerHomes = homes.getByPlayer(players.getByPlayer(player)!!)
+        for (home in playerHomes) {
+            if (position == home.position) {
+                return true
+            }
+        }
+        return false
     }
 }
