@@ -146,8 +146,12 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         }
         secondPane.addItem(confirmGuiItem, 0, 0)
         gui.resultComponent.addPane(secondPane)
-        gui.setOnClose { if (!homeBuilder.sleep) {
-            GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP) }}
+        gui.setOnClose {
+            if (!homeBuilder.sleep) {
+                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+            }
+            homeBuilder.sleep(false)
+        }
         gui.show(homeBuilder.player)
     }
 
