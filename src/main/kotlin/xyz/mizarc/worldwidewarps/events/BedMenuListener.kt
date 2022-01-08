@@ -40,6 +40,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
             0.0, 0.0, Direction.toYaw(direction), true, false)
         val homeBuilder = Home.Builder(event.player, event.bed.world, Position(event.bed.location), bed)
         homeBuilder.pose = pose
+        homeBuilder.sleep(false)
 
         event.player.bedSpawnLocation = event.bed.location
         openHomeSelectionMenu(homeBuilder)
@@ -47,7 +48,6 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
     }
 
     private fun openHomeSelectionMenu(homeBuilder: Home.Builder) {
-        homeBuilder.sleep(false)
         val playerState = players.getByPlayer(homeBuilder.player) ?: return
 
         // Create homes menu
