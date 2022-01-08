@@ -37,6 +37,8 @@ dependencies {
     implementation("co.aikar:idb-core:1.0.0-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:2.4.1")
     implementation("com.github.stefvanschie.inventoryframework:IF:0.10.4")
+    implementation("com.github.MilkBowl:VaultAPI:1.7")
+    compileOnly(files("libs/GSit.jar"))
 }
 
 tasks.shadowJar {

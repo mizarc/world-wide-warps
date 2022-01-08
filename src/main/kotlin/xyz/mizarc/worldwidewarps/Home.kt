@@ -1,8 +1,12 @@
 package xyz.mizarc.worldwidewarps
 
+import dev.geco.gsit.objects.IGPoseSeat
 import org.bukkit.DyeColor
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
+import org.bukkit.block.data.type.Bed
+import org.bukkit.entity.Player
+import xyz.mizarc.worldwidewarps.utils.getColour
 import java.util.*
 
 /**
@@ -27,23 +31,23 @@ class Home(val id: UUID, val player: OfflinePlayer, val name: String, val colour
             this(UUID.randomUUID(), player, name, colour, world, position)
 
     constructor(builder: Builder):
-            this(UUID.randomUUID(), builder.player, builder.name, builder.colour, builder.world, builder.position)
+            this(UUID.randomUUID(), builder.player, builder.name, builder.bed.getColour(), builder.world, builder.position)
 
-    class Builder(val player: OfflinePlayer, val world: World, val position: Position) {
+    class Builder(val player: Player, val world: World, val position: Position, val bed: Bed) {
         var name = ""
-        var colour = DyeColor.WHITE
         var sleep = true
+        lateinit var pose: IGPoseSeat
 
         fun name(name: String) {
             this.name = name
         }
 
-        fun colour(colour: DyeColor) {
-            this.colour = colour
+        fun sleep(state: Boolean) {
+            this.sleep = state
         }
 
-        fun sleep(state: Boolean) {
-            this.sleep = false
+        fun pose(pose: IGPoseSeat) {
+            this.pose = pose
         }
 
         fun build() = Home(this)

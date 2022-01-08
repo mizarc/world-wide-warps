@@ -4,26 +4,29 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.gui.type.AnvilGui
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
+import dev.geco.gsit.api.GSitAPI
+import dev.geco.gsit.objects.GetUpReason
 import org.apache.commons.lang.WordUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.World
 import org.bukkit.block.data.type.Bed
 import org.bukkit.entity.Player
+import org.bukkit.entity.Pose
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.inventory.ItemStack
-import xyz.mizarc.worldwidewarps.Position
 import xyz.mizarc.worldwidewarps.Home
 import xyz.mizarc.worldwidewarps.HomeContainer
 import xyz.mizarc.worldwidewarps.PlayerContainer
+import xyz.mizarc.worldwidewarps.Position
 import xyz.mizarc.worldwidewarps.utils.getColour
 import xyz.mizarc.worldwidewarps.utils.lore
 import xyz.mizarc.worldwidewarps.utils.name
 import xyz.mizarc.worldwidewarps.utils.toBed
+import java.util.*
 
 class BedMenuListener(private val homes: HomeContainer, private val players: PlayerContainer): Listener {
 
@@ -33,15 +36,20 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
             return
         }
 
+        val pose = GSitAPI.createPose(event.bed, event.player, Pose.SLEEPING, 0.0,
+            0.0, 0.0, 0f, true, false)
+        val bed = event.bed.blockData as Bed
+        val homeBuilder = Home.Builder(event.player, event.bed.world, Position(event.bed.location), bed)
+        homeBuilder.pose = pose
+
         event.player.bedSpawnLocation = event.bed.location
-        openHomeSelectionMenu(
-            event.player, event.bed.location.world!!, Position(event.bed.location),
-            event.bed.blockData as Bed)
+        openHomeSelectionMenu(homeBuilder)
         event.isCancelled = true
     }
 
-    private fun openHomeSelectionMenu(player: Player, world: World, position: Position, bed: Bed) {
-        val playerState = players.getByPlayer(player) ?: return
+    private fun openHomeSelectionMenu(homeBuilder: Home.Builder) {
+        homeBuilder.sleep(false)
+        val playerState = players.getByPlayer(homeBuilder.player) ?: return
 
         // Create homes menu
         val gui = ChestGui(1, "Homes")
@@ -50,16 +58,16 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         var lastPaneEntry = 1
 
         // Add bed player is currently sleeping in
-        val currentBedItem = ItemStack(bed.material)
+        val currentBedItem = ItemStack(homeBuilder.bed.material)
             .name("Current Home")
-            .lore("You will respawn at this bed (${position.x} / ${position.y} / ${position.z})")
+            .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
         val guiCurrentBedItem = GuiItem(currentBedItem) { guiEvent -> guiEvent.isCancelled = true }
         pane.addItem(guiCurrentBedItem, 0, 0)
 
+        // Add separator
         val separator = ItemStack(Material.BLACK_STAINED_GLASS_PANE).name(" ")
         val guisSeparator = GuiItem(separator) { guiEvent -> guiEvent.isCancelled = true }
         pane.addItem(guisSeparator, 1, 0)
-
 
         // Add existing homes to menu
         val playerHomes = homes.getByPlayer(playerState)
@@ -71,9 +79,14 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
                     .lore("Teleports to bed at ${home.position.x}, ${home.position.y}, ${home.position.z}.")
                     .lore("Right click to edit.")
                 val guiBedItem = GuiItem(bedItem) { guiEvent ->
+                    homeBuilder.sleep = true
                     when (guiEvent.click) {
-                        ClickType.RIGHT -> openHomeEditMenu(player, world, position, bed, home)
-                        else -> player.teleport(home.position.toLocation(home.world))
+                        ClickType.RIGHT -> {
+                            openHomeEditMenu(homeBuilder, home) }
+                        else ->  {
+                            GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                            teleportToBed(homeBuilder.player, home)
+                        }
                     }
                 }
                 pane.addItem(guiBedItem, i + 2, 0)
@@ -82,31 +95,41 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         }
 
         // Sets new home item based on home state
-        val guiItem = if (isHomeAlreadySet(player, position)) {
-            val newBedItem = ItemStack(Material.MAGMA_CREAM)
-                .name("Home already set")
-                .lore("You cannot set an already saved home.")
-            GuiItem(newBedItem) { guiEvent -> guiEvent.isCancelled = true }
-        }
-        else {
-            val newBedItem = ItemStack(Material.NETHER_STAR)
-                .name("Add new home")
-                .lore("Sets your current bed as a saved home.")
-            GuiItem(newBedItem) { openHomeCreationMenu(player, world, position, bed) }
+        if (playerHomes.count() < playerState.getHomeLimit())
+        {
+            val guiItem = if (isHomeAlreadySet(homeBuilder.player, homeBuilder.position)) {
+                val newBedItem = ItemStack(Material.MAGMA_CREAM)
+                    .name("Home already set")
+                    .lore("You cannot set an already saved home.")
+                GuiItem(newBedItem) { guiEvent -> guiEvent.isCancelled = true }
+            }
+            else {
+                val newBedItem = ItemStack(Material.NETHER_STAR)
+                    .name("Add new home")
+                    .lore("Sets your current bed as a saved home.")
+                GuiItem(newBedItem) { openHomeCreationMenu(homeBuilder) }
+            }
+            pane.addItem(guiItem, lastPaneEntry + 1, 0)
         }
 
-        // Add new home item to menu
-        pane.addItem(guiItem, lastPaneEntry + 1, 0)
-        gui.show(player)
+        gui.setOnClose {
+            if (!homeBuilder.sleep) {
+                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+            }
+            homeBuilder.sleep(false)
+        }
+        gui.show(homeBuilder.player)
     }
 
-    private fun openHomeCreationMenu(player: Player, world: World, position: Position, bed: Bed) {
+    private fun openHomeCreationMenu(homeBuilder: Home.Builder) {
         // Create homes menu
+        homeBuilder.sleep(false)
         val gui = AnvilGui("Name your home")
 
         // Add bed menu item
         val firstPane = StaticPane(0, 0, 1, 1)
-        val bedItem = ItemStack(bed.material).lore("${position.x}, ${position.y}, ${position.z}")
+        val bedItem = ItemStack(homeBuilder.bed.material)
+            .lore("${homeBuilder.position.x}, ${homeBuilder.position.y}, ${homeBuilder.position.z}")
         val guiItem = GuiItem(bedItem) { guiEvent -> guiEvent.isCancelled = true }
         firstPane.addItem(guiItem, 0, 0)
         gui.firstItemComponent.addPane(firstPane)
@@ -115,19 +138,24 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         val secondPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
+            homeBuilder.sleep(true)
             guiEvent.isCancelled = true
-            homes.add(Home(Bukkit.getOfflinePlayer(player.uniqueId), gui.renameText, bed.getColour(), world, position))
-            openHomeSelectionMenu(player, world, position, bed)
+            homes.add(Home(Bukkit.getOfflinePlayer(
+                homeBuilder.player.uniqueId), gui.renameText, homeBuilder.bed.getColour(),
+                homeBuilder.world, homeBuilder.position))
+            openHomeSelectionMenu(homeBuilder)
         }
         secondPane.addItem(confirmGuiItem, 0, 0)
         gui.resultComponent.addPane(secondPane)
-        gui.show(player)
+        gui.setOnClose { if (!homeBuilder.sleep) {
+            GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP) }}
+        gui.show(homeBuilder.player)
     }
 
-    private fun openHomeEditMenu(player: Player, world: World, position: Position, bed: Bed, home: Home) {
+    private fun openHomeEditMenu(homeBuilder: Home.Builder, editingHome: Home) {
         // Create edit menu
-        val name = home.name.ifEmpty {
-            WordUtils.capitalizeFully(home.colour.toBed().name.replace("_", " "))
+        val name = editingHome.name.ifEmpty {
+            WordUtils.capitalizeFully(editingHome.colour.toBed().name.replace("_", " "))
         }
         val gui = ChestGui(1, "Editing $name")
         val pane = StaticPane(0, 0, 9, 1)
@@ -136,35 +164,46 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         // Add Edit button
         val renameItem = ItemStack(Material.NAME_TAG)
             .name("Rename Home")
-        val guiRenameItem = GuiItem(renameItem) { openHomeRenameMenu(player, world, position, bed, home) }
+        val guiRenameItem = GuiItem(renameItem) {
+            homeBuilder.sleep(true)
+            openHomeRenameMenu(homeBuilder, editingHome) }
         pane.addItem(guiRenameItem, 2, 0)
 
         // Add Remove button
         val removeItem = ItemStack(Material.REDSTONE)
             .name("Delete Home")
         val guiRemoveItem = GuiItem(removeItem) {
-            homes.remove(home)
-            openHomeSelectionMenu(player, world, position, bed)
+            homeBuilder.sleep(true)
+            homes.remove(editingHome)
+            openHomeSelectionMenu(homeBuilder)
         }
         pane.addItem(guiRemoveItem, 4, 0)
 
         // Add Go Back button
         val goBackItem = ItemStack(Material.NETHER_STAR)
             .name("Go Back")
-        val guiGoBackItem = GuiItem(goBackItem) { openHomeSelectionMenu(player, world, position, bed) }
+        val guiGoBackItem = GuiItem(goBackItem) {
+            homeBuilder.sleep(true)
+            openHomeSelectionMenu(homeBuilder) }
         pane.addItem(guiGoBackItem, 6, 0)
-        gui.show(player)
+        gui.setOnClose {
+            if (!homeBuilder.sleep) {
+                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+            }
+            homeBuilder.sleep(false)
+        }
+        gui.show(homeBuilder.player)
     }
 
-    private fun openHomeRenameMenu(player: Player, world: World, position: Position, bed: Bed, home: Home) {
+    private fun openHomeRenameMenu(homeBuilder: Home.Builder, editingHome: Home) {
         // Create homes menu
-        val gui = AnvilGui("Renaming ${home.name}")
+        val gui = AnvilGui("Renaming ${editingHome.name}")
 
         // Add bed menu item
         val firstPane = StaticPane(0, 0, 1, 1)
         val bedItem = ItemStack(
-            home.colour.toBed().createBlockData().material)
-            .lore("${home.position.x}, ${home.position.y}, ${home.position.z}")
+            editingHome.colour.toBed().createBlockData().material)
+            .lore("${editingHome.position.x}, ${editingHome.position.y}, ${editingHome.position.z}")
         val guiItem = GuiItem(bedItem) { guiEvent -> guiEvent.isCancelled = true }
         firstPane.addItem(guiItem, 0, 0)
         gui.firstItemComponent.addPane(firstPane)
@@ -173,16 +212,22 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         val secondPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
-            val newHome = Home(home.id, home.player,
-                gui.renameText, home.colour, home.world, home.position)
+            homeBuilder.sleep(true)
+            val newHome = Home(editingHome.id, editingHome.player,
+                gui.renameText, editingHome.colour, editingHome.world, editingHome.position)
             homes.update(newHome)
-            openHomeEditMenu(player, world, position, bed, newHome)
+            openHomeEditMenu(homeBuilder, editingHome)
             guiEvent.isCancelled = true
         }
         secondPane.addItem(confirmGuiItem, 0, 0)
         gui.resultComponent.addPane(secondPane)
-
-        gui.show(player)
+        gui.setOnClose {
+            if (!homeBuilder.sleep) {
+                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+            }
+            homeBuilder.sleep(false)
+        }
+        gui.show(Bukkit.getPlayer(editingHome.player.uniqueId)!!)
     }
 
     private fun isHomeAlreadySet(player: Player, position: Position): Boolean {
@@ -193,5 +238,12 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
             }
         }
         return false
+    }
+
+    private fun teleportToBed(player: Player, home: Home) {
+        player.teleport(Location(home.world, home.position.x.toDouble(), home.position.y.toDouble() + 1, home.position.z.toDouble()))
+        val sleepingLocation = Location(home.world, home.position.x.toDouble(), home.position.y.toDouble(), home.position.z.toDouble())
+        GSitAPI.createPose(sleepingLocation.block, player, Pose.SLEEPING)
+        player.bedSpawnLocation = home.position.toLocation(home.world)
     }
 }
