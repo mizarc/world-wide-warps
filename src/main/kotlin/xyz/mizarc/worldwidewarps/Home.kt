@@ -14,8 +14,7 @@ import java.util.*
  * @property position The position in the world.
  */
 class Home(val id: UUID, val player: OfflinePlayer, val name: String, val colour: DyeColor, val world: World,
-           val position: Position
-) {
+           val position: Position) {
 
     /**
      * Used to create a new home instance with an auto generated UUID.
@@ -26,4 +25,27 @@ class Home(val id: UUID, val player: OfflinePlayer, val name: String, val colour
      */
     constructor(player: OfflinePlayer, name: String, colour: DyeColor, world: World, position: Position):
             this(UUID.randomUUID(), player, name, colour, world, position)
+
+    constructor(builder: Builder):
+            this(UUID.randomUUID(), builder.player, builder.name, builder.colour, builder.world, builder.position)
+
+    class Builder(val player: OfflinePlayer, val world: World, val position: Position) {
+        var name = ""
+        var colour = DyeColor.WHITE
+        var sleep = true
+
+        fun name(name: String) {
+            this.name = name
+        }
+
+        fun colour(colour: DyeColor) {
+            this.colour = colour
+        }
+
+        fun sleep(state: Boolean) {
+            this.sleep = false
+        }
+
+        fun build() = Home(this)
+    }
 }
