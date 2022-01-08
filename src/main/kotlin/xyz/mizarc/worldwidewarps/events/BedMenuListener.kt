@@ -29,7 +29,8 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
 
     @EventHandler
     fun onBedShiftClick(event: PlayerBedEnterEvent) {
-        if (!event.player.isSneaking || event.bed.blockData !is Bed) {
+        if (!event.player.hasPermission("worldwidewarps.action.multihome")
+            || !event.player.isSneaking || event.bed.blockData !is Bed) {
             return
         }
 
