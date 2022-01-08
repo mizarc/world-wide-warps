@@ -18,10 +18,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.inventory.ItemStack
-import xyz.mizarc.worldwidewarps.Home
-import xyz.mizarc.worldwidewarps.HomeContainer
-import xyz.mizarc.worldwidewarps.PlayerContainer
-import xyz.mizarc.worldwidewarps.Position
+import xyz.mizarc.worldwidewarps.*
 import xyz.mizarc.worldwidewarps.utils.getColour
 import xyz.mizarc.worldwidewarps.utils.lore
 import xyz.mizarc.worldwidewarps.utils.name
@@ -36,9 +33,10 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
             return
         }
 
-        val pose = GSitAPI.createPose(event.bed, event.player, Pose.SLEEPING, 0.0,
-            0.0, 0.0, 0f, true, false)
         val bed = event.bed.blockData as Bed
+        val direction = Direction.fromVector(bed.facing.direction)
+        val pose = GSitAPI.createPose(event.bed, event.player, Pose.SLEEPING, 0.0,
+            0.0, 0.0, Direction.toYaw(direction), true, false)
         val homeBuilder = Home.Builder(event.player, event.bed.world, Position(event.bed.location), bed)
         homeBuilder.pose = pose
 
@@ -140,9 +138,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
             homeBuilder.sleep(true)
             guiEvent.isCancelled = true
-            homes.add(Home(Bukkit.getOfflinePlayer(
-                homeBuilder.player.uniqueId), gui.renameText, homeBuilder.bed.getColour(),
-                homeBuilder.world, homeBuilder.position))
+            homes.add(homeBuilder.name(gui.renameText).build())
             openHomeSelectionMenu(homeBuilder)
         }
         secondPane.addItem(confirmGuiItem, 0, 0)
@@ -214,7 +210,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
             homeBuilder.sleep(true)
             val newHome = Home(editingHome.id, editingHome.player,
-                gui.renameText, editingHome.colour, editingHome.world, editingHome.position)
+                gui.renameText, editingHome.colour, editingHome.world, editingHome.position, editingHome.direction)
             homes.update(newHome)
             openHomeEditMenu(homeBuilder, editingHome)
             guiEvent.isCancelled = true

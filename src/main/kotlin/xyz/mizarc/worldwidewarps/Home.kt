@@ -18,7 +18,7 @@ import java.util.*
  * @property position The position in the world.
  */
 class Home(val id: UUID, val player: OfflinePlayer, val name: String, val colour: DyeColor, val world: World,
-           val position: Position) {
+           val position: Position, val direction: Direction) {
 
     /**
      * Used to create a new home instance with an auto generated UUID.
@@ -27,27 +27,33 @@ class Home(val id: UUID, val player: OfflinePlayer, val name: String, val colour
      * @param colour The colour of the bed.
      * @param position The position in the world.
      */
-    constructor(player: OfflinePlayer, name: String, colour: DyeColor, world: World, position: Position):
-            this(UUID.randomUUID(), player, name, colour, world, position)
+    constructor(player: OfflinePlayer, name: String, colour: DyeColor,
+                world: World, position: Position, direction: Direction):
+            this(UUID.randomUUID(), player, name, colour, world, position, direction)
 
     constructor(builder: Builder):
-            this(UUID.randomUUID(), builder.player, builder.name, builder.bed.getColour(), builder.world, builder.position)
+            this(UUID.randomUUID(), builder.player, builder.name, builder.bed.getColour(),
+                builder.world, builder.position, builder.direction)
 
     class Builder(val player: Player, val world: World, val position: Position, val bed: Bed) {
         var name = ""
         var sleep = true
         lateinit var pose: IGPoseSeat
+        val direction: Direction = Direction.fromVector(bed.facing.direction)
 
-        fun name(name: String) {
+        fun name(name: String): Builder {
             this.name = name
+            return this
         }
 
-        fun sleep(state: Boolean) {
+        fun sleep(state: Boolean): Builder {
             this.sleep = state
+            return this
         }
 
-        fun pose(pose: IGPoseSeat) {
+        fun pose(pose: IGPoseSeat): Builder {
             this.pose = pose
+            return this
         }
 
         fun build() = Home(this)

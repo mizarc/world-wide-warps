@@ -22,7 +22,7 @@ class HomeContainer(private val database: Database, private val players: PlayerC
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")), world,
                     Position(result.getInt("positionX"), result.getInt("positionY"),
-                        result.getInt("positionZ"))
+                        result.getInt("positionZ")), Direction.values()[result.getInt("direction")]
                 ))
             }
         }
@@ -48,8 +48,8 @@ class HomeContainer(private val database: Database, private val players: PlayerC
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")), world,
                     Position(result.getInt("positionX"), result.getInt("positionY"),
-                        result.getInt("positionZ")
-                ))
+                        result.getInt("positionZ")), Direction.values()[result.getInt("direction")]
+                )
                 foundHomes.add(home)
                 homes.add(home)
             }
@@ -77,7 +77,7 @@ class HomeContainer(private val database: Database, private val players: PlayerC
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
                     result.getString("name"), DyeColor.valueOf(result.getString("colour")), world,
                     Position(result.getInt("positionX"), result.getInt("positionY"),
-                        result.getInt("positionZ"))
+                        result.getInt("positionZ")), Direction.values()[result.getInt("direction")]
                 ))
             }
         }
@@ -88,9 +88,9 @@ class HomeContainer(private val database: Database, private val players: PlayerC
     fun add(home: Home) {
         homes.add(home)
         database.executeInsert("INSERT INTO homes (id, playerId, name, colour, worldId, " +
-                "positionX, positionY, positionZ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                "positionX, positionY, positionZ, direction) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
             home.id, home.player.uniqueId, home.name, home.colour, home.world.uid,
-            home.position.x, home.position.y, home.position.z)
+            home.position.x, home.position.y, home.position.z, home.direction.ordinal)
     }
 
     fun update(home: Home) {
@@ -102,9 +102,9 @@ class HomeContainer(private val database: Database, private val players: PlayerC
                 homes.add(home)
 
                 database.executeUpdate("UPDATE homes SET playerId=?, name=?, colour=?, worldId=?, " +
-                        "positionX=?, positionY=?, positionZ=? WHERE id=?",
+                        "positionX=?, positionY=?, positionZ=? direction=? WHERE id=?",
                     home.player.uniqueId, home.name, home.colour, home.world.uid,
-                    home.position.x, home.position.y, home.position.z, home.id)
+                    home.position.x, home.position.y, home.position.z, home.id, home.direction.ordinal)
                 return
             }
         }
