@@ -105,7 +105,10 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
                 val newBedItem = ItemStack(Material.NETHER_STAR)
                     .name("Add new home")
                     .lore("Sets your current bed as a saved home.")
-                GuiItem(newBedItem) { openHomeCreationMenu(homeBuilder) }
+                GuiItem(newBedItem) {
+                    homeBuilder.sleep = true
+                    openHomeCreationMenu(homeBuilder)
+                }
             }
             pane.addItem(guiItem, lastPaneEntry + 1, 0)
         }
@@ -121,7 +124,6 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
 
     private fun openHomeCreationMenu(homeBuilder: Home.Builder) {
         // Create homes menu
-        homeBuilder.sleep(false)
         val gui = AnvilGui("Name your home")
 
         // Add bed menu item
@@ -239,7 +241,8 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
     private fun teleportToBed(player: Player, home: Home) {
         player.teleport(Location(home.world, home.position.x.toDouble(), home.position.y.toDouble() + 1, home.position.z.toDouble()))
         val sleepingLocation = Location(home.world, home.position.x.toDouble(), home.position.y.toDouble(), home.position.z.toDouble())
-        GSitAPI.createPose(sleepingLocation.block, player, Pose.SLEEPING)
+        GSitAPI.createPose(sleepingLocation.block, player, Pose.SLEEPING,
+            0.0, 0.0, 0.0, Direction.toYaw(home.direction), true, true)
         player.bedSpawnLocation = home.position.toLocation(home.world)
     }
 }
