@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import xyz.mizarc.worldwidewarps.commands.HomeCommand
 import xyz.mizarc.worldwidewarps.commands.SetspawnCommand
 import xyz.mizarc.worldwidewarps.commands.SpawnCommand
+import xyz.mizarc.worldwidewarps.events.BedDestructionListener
 import xyz.mizarc.worldwidewarps.events.BedMenuListener
 import xyz.mizarc.worldwidewarps.events.PlayerRegistrationListener
 import xyz.mizarc.worldwidewarps.events.TeleportCancelListener
@@ -26,6 +27,7 @@ class WorldWideWarps: JavaPlugin() {
         metadata = serviceProvider.provider
         commandManager = PaperCommandManager(this)
         dataFolder.mkdir()
+        homes.getAll()
         registerDependencies()
         registerCommands()
         registerEvents()
@@ -53,5 +55,6 @@ class WorldWideWarps: JavaPlugin() {
         server.pluginManager.registerEvents(PlayerRegistrationListener(homes, players, config, metadata), this)
         server.pluginManager.registerEvents(TeleportCancelListener(players), this)
         server.pluginManager.registerEvents(BedMenuListener(homes, players), this)
+        server.pluginManager.registerEvents(BedDestructionListener(homes), this)
     }
 }
