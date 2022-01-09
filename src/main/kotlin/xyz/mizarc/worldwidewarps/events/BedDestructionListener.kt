@@ -1,6 +1,5 @@
 package xyz.mizarc.worldwidewarps.events
 
-import org.bukkit.block.Block
 import org.bukkit.block.data.type.Bed
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
