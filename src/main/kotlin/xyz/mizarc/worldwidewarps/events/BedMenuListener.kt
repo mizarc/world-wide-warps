@@ -19,11 +19,9 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.inventory.ItemStack
 import xyz.mizarc.worldwidewarps.*
-import xyz.mizarc.worldwidewarps.utils.getColour
 import xyz.mizarc.worldwidewarps.utils.lore
 import xyz.mizarc.worldwidewarps.utils.name
 import xyz.mizarc.worldwidewarps.utils.toBed
-import java.util.*
 
 class BedMenuListener(private val homes: HomeContainer, private val players: PlayerContainer): Listener {
 
@@ -37,7 +35,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         val bed = event.bed.blockData as Bed
         val direction = Direction.fromVector(bed.facing.direction)
         val pose = GSitAPI.createPose(event.bed, event.player, Pose.SLEEPING, 0.0,
-            0.0, 0.0, Direction.toYaw(direction), true, false)
+            0.0, 0.0, Direction.toYaw(direction), true)
         val homeBuilder = Home.Builder(event.player, event.bed.world, Position(event.bed.location), bed)
         homeBuilder.pose = pose
         homeBuilder.sleep(false)
@@ -83,7 +81,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
                         ClickType.RIGHT -> {
                             openHomeEditMenu(homeBuilder, home) }
                         else ->  {
-                            GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                            GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
                             teleportToBed(homeBuilder.player, home)
                         }
                     }
@@ -116,7 +114,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
 
         gui.setOnClose {
             if (!homeBuilder.sleep) {
-                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
             }
             homeBuilder.sleep(false)
         }
@@ -148,7 +146,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         gui.resultComponent.addPane(secondPane)
         gui.setOnClose {
             if (!homeBuilder.sleep) {
-                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
             }
             homeBuilder.sleep(false)
         }
@@ -191,7 +189,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         pane.addItem(guiGoBackItem, 6, 0)
         gui.setOnClose {
             if (!homeBuilder.sleep) {
-                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
             }
             homeBuilder.sleep(false)
         }
@@ -226,7 +224,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         gui.resultComponent.addPane(secondPane)
         gui.setOnClose {
             if (!homeBuilder.sleep) {
-                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
             }
             homeBuilder.sleep(false)
         }
@@ -247,7 +245,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         player.teleport(Location(home.world, home.position.x.toDouble(), home.position.y.toDouble() + 1, home.position.z.toDouble()))
         val sleepingLocation = Location(home.world, home.position.x.toDouble(), home.position.y.toDouble(), home.position.z.toDouble())
         GSitAPI.createPose(sleepingLocation.block, player, Pose.SLEEPING,
-            0.0, 0.0, 0.0, Direction.toYaw(home.direction), true, true)
+            0.0, 0.0, 0.0, Direction.toYaw(home.direction), true)
         player.bedSpawnLocation = home.position.toLocation(home.world)
     }
 }
