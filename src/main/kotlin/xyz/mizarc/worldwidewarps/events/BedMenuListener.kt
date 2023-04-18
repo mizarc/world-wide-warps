@@ -43,6 +43,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
     fun onBedMenuCloseEvent(event: InventoryCloseEvent) {
         if (event.player in playersInMenu) {
             playersInMenu.remove(event.player)
+            GSitAPI.removePose(event.player as Player, GetUpReason.GET_UP)
         }
     }
 
