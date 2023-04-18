@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.6.0"
-    id("com.github.johnrengelman.shadow") version "7.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 group = "xyz.mizarc"
@@ -11,7 +11,8 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven {
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+        name = "papermc"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots")
@@ -30,14 +31,13 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    compileOnly("org.spigotmc:spigot-api:1.18-pre8-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
     shadow("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
-    implementation("com.github.Gecolay:GSit:5f088cbe9d")
     implementation("co.aikar:idb-core:1.0.0-SNAPSHOT")
+    implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:2.4.1")
-    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.4")
-    implementation("com.github.MilkBowl:VaultAPI:1.7")
+    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.9")
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly(files("libs/GSit.jar"))
 }
 
@@ -53,6 +53,6 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
     kotlinOptions.javaParameters = true
 }

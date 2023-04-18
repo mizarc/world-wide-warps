@@ -22,6 +22,7 @@ class WorldWideWarps: JavaPlugin() {
     val teleporter = Teleporter(this, players)
 
     override fun onEnable() {
+        logger.info(Chat::class.java.toString())
         val serviceProvider: RegisteredServiceProvider<Chat> = server.servicesManager.getRegistration(Chat::class.java)!!
         metadata = serviceProvider.provider
         commandManager = PaperCommandManager(this)

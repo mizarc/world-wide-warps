@@ -10,6 +10,7 @@ import org.apache.commons.lang.WordUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.block.data.type.Bed
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
 import org.bukkit.event.inventory.ClickType
@@ -21,7 +22,6 @@ import xyz.mizarc.worldwidewarps.utils.toBed
 
 class BedMenu(private val homes: HomeContainer, private val playerState: PlayerState,
               private val homeBuilder: Home.Builder) {
-
     fun openHomeSelectionMenu() {
         // Create homes menu
         val gui = ChestGui(1, "Homes")
@@ -54,9 +54,11 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
                     homeBuilder.sleep = true
                     when (guiEvent.click) {
                         ClickType.RIGHT -> {
-                            openHomeEditMenu(homeBuilder, home) }
+                            openHomeEditMenu(homeBuilder, home)
+                        }
                         else ->  {
-                            GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                            playerState.inBedMenu = false
+                            GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
                             teleportToBed(homeBuilder.player, home)
                         }
                     }
@@ -89,11 +91,12 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
 
         gui.setOnClose {
             if (!homeBuilder.sleep) {
-                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
             }
             homeBuilder.sleep(false)
         }
         gui.show(homeBuilder.player)
+        playerState.inBedMenu = true
     }
 
     fun openHomeCreationMenu(homeBuilder: Home.Builder) {
@@ -121,7 +124,7 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
         gui.resultComponent.addPane(secondPane)
         gui.setOnClose {
             if (!homeBuilder.sleep) {
-                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
             }
             homeBuilder.sleep(false)
         }
@@ -164,7 +167,7 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
         pane.addItem(guiGoBackItem, 6, 0)
         gui.setOnClose {
             if (!homeBuilder.sleep) {
-                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
             }
             homeBuilder.sleep(false)
         }
@@ -199,7 +202,7 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
         gui.resultComponent.addPane(secondPane)
         gui.setOnClose {
             if (!homeBuilder.sleep) {
-                GSitAPI.removePose(homeBuilder.pose, GetUpReason.GET_UP)
+                GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
             }
             homeBuilder.sleep(false)
         }
@@ -217,10 +220,13 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
     }
 
     private fun teleportToBed(player: Player, home: Home) {
-        player.teleport(Location(home.world, home.position.x.toDouble(), home.position.y.toDouble() + 1, home.position.z.toDouble()))
+        // Set player's view to align with the bed
         val sleepingLocation = Location(home.world, home.position.x.toDouble(), home.position.y.toDouble(), home.position.z.toDouble())
+        val bed = sleepingLocation.block.blockData as Bed
+        val direction = Direction.fromVector(bed.facing.direction)
+        player.teleport(Location(home.world, home.position.x.toDouble(), home.position.y.toDouble() + 1, home.position.z.toDouble(), Direction.toYaw(direction), 0.0f))
         GSitAPI.createPose(sleepingLocation.block, player, Pose.SLEEPING,
-            0.0, 0.0, 0.0, Direction.toYaw(home.direction), true, true)
+            0.0, 0.0, 0.0, Direction.toYaw(home.direction), true)
         player.bedSpawnLocation = home.position.toLocation(home.world)
     }
 }
