@@ -107,8 +107,10 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
                     homeBuilder.sleep = true
                     when (guiEvent.click) {
                         ClickType.RIGHT -> {
-                            openHomeEditMenu(homeBuilder, home) }
+                            openHomeEditMenu(homeBuilder, home)
+                        }
                         else ->  {
+                            playersInMenu.remove(homeBuilder.player)
                             GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
                             teleportToBed(homeBuilder.player, home)
                         }
@@ -120,8 +122,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
         }
 
         // Sets new home item based on home state
-        if (playerHomes.count() < playerState.getHomeLimit())
-        {
+        if (playerHomes.count() < playerState.getHomeLimit()) {
             val guiItem = if (isHomeAlreadySet(homeBuilder.player, homeBuilder.position)) {
                 val newBedItem = ItemStack(Material.MAGMA_CREAM)
                     .name("Home already set")
