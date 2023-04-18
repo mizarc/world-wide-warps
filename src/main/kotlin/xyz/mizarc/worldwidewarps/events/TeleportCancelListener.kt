@@ -17,9 +17,9 @@ class TeleportCancelListener(val playerContainer: PlayerContainer): Listener {
 
 
         // Do nothing if player hasn't moved position
-        val xPos = event.from.blockX == event.to!!.blockX
-        val yPos = event.from.blockY == event.to!!.blockY
-        val zPos = event.from.blockZ == event.to!!.blockZ
+        val xPos = event.from.blockX == event.to.blockX
+        val yPos = event.from.blockY == event.to.blockY
+        val zPos = event.from.blockZ == event.to.blockZ
         if (xPos && yPos && zPos) {
             return
         }

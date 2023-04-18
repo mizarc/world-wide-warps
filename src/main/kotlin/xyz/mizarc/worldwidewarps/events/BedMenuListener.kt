@@ -5,7 +5,12 @@ import com.github.stefvanschie.inventoryframework.gui.type.AnvilGui
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import dev.geco.gsit.api.GSitAPI
+import dev.geco.gsit.api.event.EntitySitEvent
+import dev.geco.gsit.api.event.PlayerGetUpPoseEvent
+import dev.geco.gsit.api.event.PlayerPlayerSitEvent
+import dev.geco.gsit.api.event.PrePlayerGetUpPoseEvent
 import dev.geco.gsit.objects.GetUpReason
+import dev.geco.gsit.objects.IGPoseSeat
 import org.apache.commons.lang.WordUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -16,6 +21,7 @@ import org.bukkit.entity.Pose
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.inventory.ItemStack
 import xyz.mizarc.worldwidewarps.*
@@ -24,6 +30,21 @@ import xyz.mizarc.worldwidewarps.utils.name
 import xyz.mizarc.worldwidewarps.utils.toBed
 
 class BedMenuListener(private val homes: HomeContainer, private val players: PlayerContainer): Listener {
+    private val playersInMenu: MutableList<Player> = mutableListOf()
+
+    @EventHandler
+    fun onPlayerGetUpPoseEvent(event: PrePlayerGetUpPoseEvent) {
+        if (event.player in playersInMenu) {
+            event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun onBedMenuCloseEvent(event: InventoryCloseEvent) {
+        if (event.player in playersInMenu) {
+            playersInMenu.remove(event.player)
+        }
+    }
 
     @EventHandler
     fun onBedShiftClick(event: PlayerBedEnterEvent) {
@@ -34,15 +55,14 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
 
         val bed = event.bed.blockData as Bed
         val direction = Direction.fromVector(bed.facing.direction)
+
+        event.isCancelled = true
+
+        val homeBuilder = Home.Builder(event.player, event.bed.world, Position(event.bed.location), bed)
+        openHomeSelectionMenu(homeBuilder)
         val pose = GSitAPI.createPose(event.bed, event.player, Pose.SLEEPING, 0.0,
             0.0, 0.0, Direction.toYaw(direction), true)
-        val homeBuilder = Home.Builder(event.player, event.bed.world, Position(event.bed.location), bed)
-        homeBuilder.pose = pose
-        homeBuilder.sleep(false)
-
         event.player.bedSpawnLocation = event.bed.location
-        openHomeSelectionMenu(homeBuilder)
-        event.isCancelled = true
     }
 
     private fun openHomeSelectionMenu(homeBuilder: Home.Builder) {
@@ -119,6 +139,7 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
             homeBuilder.sleep(false)
         }
         gui.show(homeBuilder.player)
+        playersInMenu.add(homeBuilder.player)
     }
 
     private fun openHomeCreationMenu(homeBuilder: Home.Builder) {
