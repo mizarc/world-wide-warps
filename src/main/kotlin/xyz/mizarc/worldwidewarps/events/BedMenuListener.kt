@@ -58,11 +58,18 @@ class BedMenuListener(private val homes: HomeContainer, private val players: Pla
 
         event.isCancelled = true
 
-        val homeBuilder = Home.Builder(event.player, event.bed.world, Position(event.bed.location), bed)
-        openHomeSelectionMenu(homeBuilder)
-        val pose = GSitAPI.createPose(event.bed, event.player, Pose.SLEEPING, 0.0,
+        // Set player's view to align with the bed
+        val newLocation = event.bed.location
+        newLocation.pitch = 0.0f
+        newLocation.yaw = Direction.toYaw(direction)
+        event.player.teleport(newLocation)
+
+        GSitAPI.createPose(event.bed, event.player, Pose.SLEEPING, 0.0,
             0.0, 0.0, Direction.toYaw(direction), true)
         event.player.bedSpawnLocation = event.bed.location
+
+        val homeBuilder = Home.Builder(event.player, event.bed.world, Position(event.bed.location), bed)
+        openHomeSelectionMenu(homeBuilder)
     }
 
     private fun openHomeSelectionMenu(homeBuilder: Home.Builder) {
