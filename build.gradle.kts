@@ -31,12 +31,12 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     shadow("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("co.aikar:idb-core:1.0.0-SNAPSHOT")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
-    implementation("com.zaxxer:HikariCP:2.4.1")
-    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.9")
+    implementation("com.zaxxer:HikariCP:5.0.1")
+    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.11")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly(files("libs/GSit.jar"))
 }
