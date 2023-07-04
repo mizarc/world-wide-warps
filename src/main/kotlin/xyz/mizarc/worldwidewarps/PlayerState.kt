@@ -15,4 +15,18 @@ class PlayerState(val player: Player, val config: Config, val metadata: Chat) {
         }
         return config.homeLimit
     }
+
+    fun getHomeTeleportTimer(): Int {
+        if (metadata.getPlayerInfoInteger(player, "home_teleport_timer", -1) > -1) {
+            return metadata.getPlayerInfoInteger(player, "home_teleport_timer", -1)
+        }
+        return config.homeTimer
+    }
+
+    fun getHomeTeleportCost(): Int {
+        if (metadata.getPlayerInfoInteger(player, "home_teleport_cost", -1) > -1) {
+            return metadata.getPlayerInfoInteger(player, "home_teleport_cost", -1)
+        }
+        return config.homeTimer
+    }
 }
