@@ -30,10 +30,10 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
 
         // Add bed player is currently sleeping in
         val playerHomes = homes.getByPlayer(playerState)
-        val existingHome = playerHomes.find {it.position == homeBuilder.position}
+        val existingHome = homes.getAll().find {it.position == homeBuilder.position}
 
         val guiCurrentBedItem: GuiItem
-        if (existingHome != null) {
+        if (existingHome != null && existingHome.player.uniqueId == playerState.player.uniqueId) {
             val currentBedItem = ItemStack(homeBuilder.bed.material)
                 .name("Current Home")
                 .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
@@ -41,6 +41,13 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
             guiCurrentBedItem = GuiItem(currentBedItem) { _ ->
                 openHomeEditMenu(homeBuilder, existingHome)
             }
+        }
+        else if (existingHome != null) {
+            val currentBedItem = ItemStack(homeBuilder.bed.material)
+                .name("Current Home")
+                .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
+                .lore("This home belongs to ${existingHome.player.name}.")
+            guiCurrentBedItem = GuiItem(currentBedItem) { guiEvent -> guiEvent.isCancelled = true }
         }
         else {
             val currentBedItem = ItemStack(homeBuilder.bed.material)
