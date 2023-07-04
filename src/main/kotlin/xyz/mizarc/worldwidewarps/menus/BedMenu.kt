@@ -29,33 +29,27 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
         var lastPaneEntry = 1
 
         // Add bed player is currently sleeping in
-        val playerHomes = homes.getByPlayer(playerState)
-        val existingHome = homes.getAll().find {it.position == homeBuilder.position}
-
+        val existingHome = homes.getAll().find { it.position == homeBuilder.position }
         val guiCurrentBedItem: GuiItem
-        if (existingHome != null && existingHome.player.uniqueId == playerState.player.uniqueId) {
-            val currentBedItem = ItemStack(homeBuilder.bed.material)
-                .name("Current Home")
-                .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
-                .lore("This home belongs to you. Click to edit.")
-            guiCurrentBedItem = GuiItem(currentBedItem) { _ ->
-                openHomeEditMenu(homeBuilder, existingHome)
+        val currentBedItem = ItemStack(homeBuilder.bed.material)
+            .name("Current Home")
+            .lore("You will respawn at this bed " +
+                    "(${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
+
+        // Change bed info depending on who owns the bed, or if bed is unowned
+        if (existingHome != null) {
+            if (existingHome.player.uniqueId == playerState.player.uniqueId) {
+                currentBedItem.lore("This home belongs to you. Click to edit.")
+                guiCurrentBedItem = GuiItem(currentBedItem) { _ -> openHomeEditMenu(homeBuilder, existingHome) }
+            }
+            else {
+                currentBedItem.lore("This home belongs to ${existingHome.player.name}.")
+                guiCurrentBedItem = GuiItem(currentBedItem) { guiEvent -> guiEvent.isCancelled = true }
             }
         }
-        else if (existingHome != null) {
-            val currentBedItem = ItemStack(homeBuilder.bed.material)
-                .name("Current Home")
-                .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
-                .lore("This home belongs to ${existingHome.player.name}.")
-            guiCurrentBedItem = GuiItem(currentBedItem) { guiEvent -> guiEvent.isCancelled = true }
-        }
         else {
-            val currentBedItem = ItemStack(homeBuilder.bed.material)
-                .name("Current Home")
-                .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
             guiCurrentBedItem = GuiItem(currentBedItem) { guiEvent -> guiEvent.isCancelled = true }
         }
-
         pane.addItem(guiCurrentBedItem, 0, 0)
 
         // Add separator
@@ -64,6 +58,7 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
         pane.addItem(guisSeparator, 1, 0)
 
         // Add existing homes to menu
+        val playerHomes = homes.getByPlayer(playerState)
         if (playerHomes.isNotEmpty()) {
             for (i in 0 until playerHomes.count()) {
                 val home = playerHomes[i]
@@ -92,6 +87,12 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
                 val newBedItem = ItemStack(Material.MAGMA_CREAM)
                     .name("Home already set")
                     .lore("You cannot set an already saved home.")
+                GuiItem(newBedItem) { guiEvent -> guiEvent.isCancelled = true }
+            }
+            else if (isHomeAlreadyOwned(homeBuilder.position)) {
+                val newBedItem = ItemStack(Material.MAGMA_CREAM)
+                    .name("Home already owned")
+                    .lore("You cannot set home owned by someone else.")
                 GuiItem(newBedItem) { guiEvent -> guiEvent.isCancelled = true }
             }
             else {
@@ -229,6 +230,16 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
     private fun isHomeAlreadySet(position: Position): Boolean {
         val playerHomes = homes.getByPlayer(playerState)
         for (home in playerHomes) {
+            if (position == home.position) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isHomeAlreadyOwned(position: Position): Boolean {
+        val allHomes = homes.getAll()
+        for (home in allHomes) {
             if (position == home.position) {
                 return true
             }
