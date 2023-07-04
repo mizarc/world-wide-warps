@@ -1,5 +1,7 @@
 package xyz.mizarc.worldwidewarps
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -17,14 +19,16 @@ class Teleporter(private val plugin: Plugin, private val playerContainer: Player
         if (playerState.getHomeTeleportCost() > 1) {
             // Alert player that they can't teleport if they don't meet the cost
             if (!hasCostAmount(player, playerState.getHomeTeleportCost())) {
-                player.sendPlainMessage("Cannot teleport. " +
-                        "You require at least ${playerState.getHomeTeleportCost()} ender pearls to teleport.")
+                player.sendActionBar(Component
+                    .text("You require at least ${playerState.getHomeTeleportCost()} ender pearls to teleport.")
+                    .color(TextColor.color(255, 85, 85)))
                 return false
             }
 
             // Teleport player home with cost
-            player.sendPlainMessage("Teleporting home." +
-                    "This will cost you ${playerState.getHomeTeleportCost()} ender pearls.")
+            player.sendActionBar(Component
+                .text("Teleporting home. This will cost you ${playerState.getHomeTeleportCost()} ender pearls.")
+                .color(TextColor.color(85, 255, 255)))
             teleport(player, homeLocation, playerState.getHomeTeleportTimer(),
                 TeleportMessage.HOME, playerState.getHomeTeleportCost())
             return true
@@ -49,12 +53,16 @@ class Teleporter(private val plugin: Plugin, private val playerContainer: Player
         // Teleports the player after a certain amount of time has passed
         playerState.teleportTask = TeleportTask(Bukkit.getScheduler().runTaskLater(plugin, Runnable {
             if (!hasCostAmount(player, teleportCost)) {
-                player.sendPlainMessage("Teleport cancelled. You no longer possess the required cost.")
+                player.sendActionBar(Component
+                    .text("Teleport cancelled. You no longer possess the required cost.")
+                    .color(TextColor.color(255, 85, 85)))
             }
             else {
                 removeCostFromInventory(player, teleportCost)
                 player.teleport((location))
-                player.sendPlainMessage(teleportMessage.messageString)
+                player.sendActionBar(Component
+                    .text(teleportMessage.messageString)
+                    .color(TextColor.color(85, 255, 85)))
             }
             playerState.teleportTask?.cancelTask()
         }, timer * 20L), playerState.player, location)
