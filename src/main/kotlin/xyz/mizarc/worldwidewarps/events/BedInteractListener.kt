@@ -3,6 +3,8 @@ package xyz.mizarc.worldwidewarps.events
 import dev.geco.gsit.api.GSitAPI
 import dev.geco.gsit.api.event.PrePlayerGetUpPoseEvent
 import dev.geco.gsit.objects.GetUpReason
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.block.data.type.Bed
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
@@ -16,11 +18,20 @@ import xyz.mizarc.worldwidewarps.menus.BedMenu
 class BedInteractListener(private val homes: HomeContainer, private val players: PlayerContainer): Listener {
     @EventHandler
     fun onBedShiftClick(event: PlayerBedEnterEvent) {
+        // Prevent player from sleeping on someone else's bed
+        val existingHome = homes.getAll().find { it.position == Position(event.bed.location) }
+        if (existingHome != null && existingHome.player.uniqueId != event.player.uniqueId) {
+            event.player.sendActionBar(Component.text("This bed is owned by ${existingHome.player.name}")
+                .color(TextColor.color(255, 85, 85)))
+            event.isCancelled = true
+            return
+        }
+
+        // Permission check for bed menu
         if (!event.player.hasPermission("worldwidewarps.action.multihome")
             || !event.player.isSneaking || event.bed.blockData !is Bed) {
             return
         }
-
         event.isCancelled = true
 
         // Set player's view to align with the bed
