@@ -46,6 +46,10 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
         if (playerHomes.isNotEmpty()) {
             for (i in 0 until playerHomes.count()) {
                 val home = playerHomes[i]
+                if (home.position == homeBuilder.position) {
+                    continue
+                }
+
                 val bedItem = ItemStack(home.colour.toBed())
                     .name(playerHomes[i].name)
                     .lore("Teleports to bed at ${home.position.x}, ${home.position.y}, ${home.position.z}.")
