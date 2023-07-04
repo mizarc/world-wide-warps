@@ -13,7 +13,6 @@ import org.bukkit.Material
 import org.bukkit.block.data.type.Bed
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
-import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
 import xyz.mizarc.worldwidewarps.*
 import xyz.mizarc.worldwidewarps.utils.lore
@@ -30,10 +29,26 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
         var lastPaneEntry = 1
 
         // Add bed player is currently sleeping in
-        val currentBedItem = ItemStack(homeBuilder.bed.material)
-            .name("Current Home")
-            .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
-        val guiCurrentBedItem = GuiItem(currentBedItem) { guiEvent -> guiEvent.isCancelled = true }
+        val playerHomes = homes.getByPlayer(playerState)
+        val existingHome = playerHomes.find {it.position == homeBuilder.position}
+
+        val guiCurrentBedItem: GuiItem
+        if (existingHome != null) {
+            val currentBedItem = ItemStack(homeBuilder.bed.material)
+                .name("Current Home")
+                .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
+                .lore("This home belongs to you. Click to edit.")
+            guiCurrentBedItem = GuiItem(currentBedItem) { _ ->
+                openHomeEditMenu(homeBuilder, existingHome)
+            }
+        }
+        else {
+            val currentBedItem = ItemStack(homeBuilder.bed.material)
+                .name("Current Home")
+                .lore("You will respawn at this bed (${homeBuilder.position.x} / ${homeBuilder.position.y} / ${homeBuilder.position.z})")
+            guiCurrentBedItem = GuiItem(currentBedItem) { guiEvent -> guiEvent.isCancelled = true }
+        }
+
         pane.addItem(guiCurrentBedItem, 0, 0)
 
         // Add separator
@@ -42,7 +57,6 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
         pane.addItem(guisSeparator, 1, 0)
 
         // Add existing homes to menu
-        val playerHomes = homes.getByPlayer(playerState)
         if (playerHomes.isNotEmpty()) {
             for (i in 0 until playerHomes.count()) {
                 val home = playerHomes[i]
@@ -53,19 +67,11 @@ class BedMenu(private val homes: HomeContainer, private val playerState: PlayerS
                 val bedItem = ItemStack(home.colour.toBed())
                     .name(playerHomes[i].name)
                     .lore("Teleports to bed at ${home.position.x}, ${home.position.y}, ${home.position.z}.")
-                    .lore("Right click to edit.")
-                val guiBedItem = GuiItem(bedItem) { guiEvent ->
+                val guiBedItem = GuiItem(bedItem) { _ ->
                     homeBuilder.sleep = true
-                    when (guiEvent.click) {
-                        ClickType.RIGHT -> {
-                            openHomeEditMenu(homeBuilder, home)
-                        }
-                        else ->  {
-                            playerState.inBedMenu = false
-                            GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
-                            teleportToBed(homeBuilder.player, home)
-                        }
-                    }
+                    playerState.inBedMenu = false
+                    GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
+                    teleportToBed(homeBuilder.player, home)
                 }
                 pane.addItem(guiBedItem, i + 2, 0)
                 lastPaneEntry = i + 2
