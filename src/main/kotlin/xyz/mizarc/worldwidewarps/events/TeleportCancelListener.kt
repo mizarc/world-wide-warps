@@ -1,5 +1,7 @@
 package xyz.mizarc.worldwidewarps.events
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
@@ -25,6 +27,8 @@ class TeleportCancelListener(val playerContainer: PlayerContainer): Listener {
         }
 
         teleportTask.cancelTask()
-        event.player.sendMessage("§cYou moved. Teleportation has been cancelled.")
+        event.player.sendActionBar(
+            Component.text("You moved. Teleportation has been cancelled.")
+            .color(TextColor.color(255, 85, 85)))
     }
 }
