@@ -19,7 +19,7 @@ class WorldWideWarps: JavaPlugin() {
     private val storage = DatabaseStorage(this)
     val players = PlayerContainer()
     val homes = HomeContainer(storage.connection, players)
-    val teleporter = Teleporter(this, players)
+    val teleporter = Teleporter(this, config, players)
 
     override fun onEnable() {
         logger.info(Chat::class.java.toString())

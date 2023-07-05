@@ -8,8 +8,9 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
+import xyz.mizarc.worldwidewarps.utils.LocationConversions
 
-class Teleporter(private val plugin: Plugin, private val playerContainer: PlayerContainer) {
+class Teleporter(private val plugin: Plugin, private val config: Config, private val playerContainer: PlayerContainer) {
 
     fun teleportHome(player: Player): Boolean {
         val homeLocation = player.bedSpawnLocation ?: return false
@@ -20,7 +21,7 @@ class Teleporter(private val plugin: Plugin, private val playerContainer: Player
             // Alert player that they can't teleport if they don't meet the cost
             if (!hasCostAmount(player, playerState.getHomeTeleportCost())) {
                 player.sendActionBar(Component
-                    .text("You require at least ${playerState.getHomeTeleportCost()} ender pearls to teleport.")
+                    .text("You require at least ${playerState.getHomeTeleportCost()} ender pearls to teleport home.")
                     .color(TextColor.color(255, 85, 85)))
                 return false
             }
@@ -36,6 +37,34 @@ class Teleporter(private val plugin: Plugin, private val playerContainer: Player
 
         // Teleport player home without cost
         teleport(player, homeLocation, playerState.getHomeTeleportTimer())
+        return true
+    }
+
+    fun teleportSpawn(player: Player): Boolean {
+        val spawnLocation = LocationConversions.stringTolocation(config.spawnLocation) ?: return false
+        val playerState = playerContainer.getByPlayer(player) ?: return false
+
+        // Do cost checks if required
+        if (playerState.getSpawnTeleportCost() > 1) {
+            // Alert player that they can't teleport if they don't meet the cost
+            if (!hasCostAmount(player, playerState.getHomeTeleportCost())) {
+                player.sendActionBar(Component
+                    .text("You require at least ${playerState.getSpawnTeleportCost()} ender pearls to teleport to spawn.")
+                    .color(TextColor.color(255, 85, 85)))
+                return false
+            }
+
+            // Teleport player home with cost
+            player.sendActionBar(Component
+                .text("Teleporting to spawn. This will cost you ${playerState.getSpawnTeleportCost()} ender pearls.")
+                .color(TextColor.color(85, 255, 255)))
+            teleport(player, spawnLocation, playerState.getSpawnTeleportTimer(),
+                TeleportMessage.SPAWN, playerState.getSpawnTeleportCost())
+            return true
+        }
+
+        // Teleport player home without cost
+        teleport(player, spawnLocation, playerState.getSpawnTeleportTimer())
         return true
     }
 
