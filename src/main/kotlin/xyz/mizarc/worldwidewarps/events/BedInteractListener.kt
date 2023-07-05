@@ -4,6 +4,8 @@ import dev.geco.gsit.api.GSitAPI
 import dev.geco.gsit.api.event.PrePlayerGetUpPoseEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
+import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.block.data.type.Bed
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
@@ -11,6 +13,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerBedEnterEvent
+import org.bukkit.util.Vector
 import xyz.mizarc.worldwidewarps.*
 import xyz.mizarc.worldwidewarps.menus.BedMenu
 
@@ -32,6 +35,13 @@ class BedInteractListener(private val homes: HomeContainer, private val players:
             return
         }
         event.isCancelled = true
+
+        // Prevent sleeping on obstructed bed
+        if (isBedObstructed(event.bed)) {
+            event.player.sendActionBar(Component.text("This bed is obstructed")
+                .color(TextColor.color(255, 85, 85)))
+            return
+        }
 
         // Set player's view to align with the bed
         val bed = event.bed.blockData as Bed
@@ -67,5 +77,27 @@ class BedInteractListener(private val homes: HomeContainer, private val players:
         if (playerState.inBedMenu) {
             event.isCancelled = true
         }
+
+        if (playerState.isLaying) {
+            playerState.isLaying = false
+            //event.player.bedSpawnLocation?.let { bedSpawnLocation ->
+            //    event.player.teleport(bedSpawnLocation.world.getS bedSpawnLocation)
+            //}
+        }
+    }
+
+    fun isBedObstructed(bedBlock: Block): Boolean {
+        val bed = bedBlock.blockData as Bed
+        val checkLocations = arrayOf(bedBlock.location.add(Vector(0, 1, 0)),
+            bedBlock.getRelative(bed.facing.oppositeFace).location.add(Vector(0, 1, 0)))
+
+        for (location in checkLocations) {
+            val block = location.block
+            if (block.type != Material.AIR) {
+                return true
+            }
+        }
+
+        return false
     }
 }
