@@ -2,7 +2,6 @@ package xyz.mizarc.worldwidewarps.events
 
 import dev.geco.gsit.api.GSitAPI
 import dev.geco.gsit.api.event.PrePlayerGetUpPoseEvent
-import dev.geco.gsit.objects.GetUpReason
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.block.data.type.Bed
@@ -54,19 +53,19 @@ class BedInteractListener(private val homes: HomeContainer, private val players:
     }
 
     @EventHandler
-    fun onPlayerGetUpPoseEvent(event: PrePlayerGetUpPoseEvent) {
-        val playerState = players.getByPlayer(event.player) ?: return
-        if (playerState.inBedMenu) {
-            event.isCancelled = true
-        }
-    }
-
-    @EventHandler
     fun onBedMenuCloseEvent(event: InventoryCloseEvent) {
         val playerState = players.getByPlayer(event.player as Player) ?: return
         if (playerState.inBedMenu) {
             playerState.inBedMenu = false
-            GSitAPI.removePose(event.player as Player, GetUpReason.GET_UP)
+            playerState.isLaying = true
+        }
+    }
+
+    @EventHandler
+    fun onPlayerGetUpPoseEvent(event: PrePlayerGetUpPoseEvent) {
+        val playerState = players.getByPlayer(event.player) ?: return
+        if (playerState.inBedMenu) {
+            event.isCancelled = true
         }
     }
 }

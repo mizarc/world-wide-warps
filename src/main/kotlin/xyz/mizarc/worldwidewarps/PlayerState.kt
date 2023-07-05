@@ -7,6 +7,7 @@ class PlayerState(val player: Player, val config: Config, val metadata: Chat) {
     var teleportTask: TeleportTask? = null
     var teleportCooldownTimer = 0
     var invitePlayer: Player? = null
+    var isLaying: Boolean = false
     var inBedMenu: Boolean = false
 
     fun getHomeLimit(): Int {
