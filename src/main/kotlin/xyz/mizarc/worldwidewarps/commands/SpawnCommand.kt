@@ -5,6 +5,8 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Dependency
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
 import xyz.mizarc.worldwidewarps.Config
@@ -23,27 +25,21 @@ class SpawnCommand: BaseCommand() {
         // Cancel if spawn doesn't exist
         val spawnLocationString = config.spawnLocation
         if (spawnLocationString.isBlank()) {
-            player.sendMessage("§cThere is no set spawn on this server.")
+            player.sendActionBar(
+                Component
+                .text("There is no set spawn on this server.")
+                    .color(TextColor.color(255, 85, 85)))
             return
         }
 
         // Cancel if set spawn location is invalid
         val spawnLocation = LocationConversions.stringTolocation(spawnLocationString)
         if (spawnLocation == null) {
-            player.sendMessage("§cThe spawn is invalid. Ask an administrator to fix this.")
+            player.sendPlainMessage("§cThe spawn is invalid. Ask an administrator to fix this.")
             return
         }
 
-        // Instant teleport if player if bypassing the timer
-        if (player.hasPermission("worldwidewarps.teleport.spawn.bypasstimer")) {
-            teleporter.teleport(player, spawnLocation, 0)
-            player.sendMessage("§aWelcome to spawn.")
-            return
-        }
-
-        // Teleports the player with timer
-        val timer = config.spawnTimer
-        player.sendMessage("§aTeleporting to spawn, please wait §6$timer §aseconds.")
-        teleporter.teleport(player, spawnLocation, timer, TeleportMessage.HOME)
+        // Teleports the player
+        teleporter.teleportSpawn(player)
     }
 }

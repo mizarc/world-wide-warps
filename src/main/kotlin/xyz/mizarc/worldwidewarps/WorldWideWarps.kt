@@ -2,14 +2,13 @@ package xyz.mizarc.worldwidewarps
 
 import co.aikar.commands.PaperCommandManager
 import net.milkbowl.vault.chat.Chat
-import net.milkbowl.vault.permission.Permission
 import org.bukkit.plugin.RegisteredServiceProvider
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.mizarc.worldwidewarps.commands.HomeCommand
 import xyz.mizarc.worldwidewarps.commands.SetspawnCommand
 import xyz.mizarc.worldwidewarps.commands.SpawnCommand
 import xyz.mizarc.worldwidewarps.events.BedDestructionListener
-import xyz.mizarc.worldwidewarps.events.BedMenuListener
+import xyz.mizarc.worldwidewarps.events.BedInteractListener
 import xyz.mizarc.worldwidewarps.events.PlayerRegistrationListener
 import xyz.mizarc.worldwidewarps.events.TeleportCancelListener
 
@@ -18,9 +17,9 @@ class WorldWideWarps: JavaPlugin() {
     private lateinit var metadata: Chat
     private val config = Config(this)
     private val storage = DatabaseStorage(this)
-    val players = PlayerContainer()
-    val homes = HomeContainer(storage.connection, players)
-    val teleporter = Teleporter(this, players)
+    val players = PlayerRepository()
+    val homes = HomeRepository(storage.connection, players)
+    val teleporter = Teleporter(this, config, players)
 
     override fun onEnable() {
         logger.info(Chat::class.java.toString())
@@ -42,7 +41,7 @@ class WorldWideWarps: JavaPlugin() {
     private fun registerDependencies() {
         commandManager.registerDependency(Config::class.java, config)
         commandManager.registerDependency(DatabaseStorage::class.java, storage)
-        commandManager.registerDependency(PlayerContainer::class.java, players)
+        commandManager.registerDependency(PlayerRepository::class.java, players)
         commandManager.registerDependency(Teleporter::class.java, teleporter)
     }
 
@@ -55,7 +54,7 @@ class WorldWideWarps: JavaPlugin() {
     private fun registerEvents() {
         server.pluginManager.registerEvents(PlayerRegistrationListener(homes, players, config, metadata), this)
         server.pluginManager.registerEvents(TeleportCancelListener(players), this)
-        server.pluginManager.registerEvents(BedMenuListener(homes, players), this)
+        server.pluginManager.registerEvents(BedInteractListener(homes, players), this)
         server.pluginManager.registerEvents(BedDestructionListener(homes), this)
     }
 }

@@ -15,6 +15,10 @@ class Config(val plugin: Plugin) {
     var homeCooldown = 0
     var inviteRange = 0
     var homeLimit = 0
+    var spawnCost = 0
+    var homeCost = 0
+    var inviteCost = 0
+    var acceptCost = 0
 
     init {
         createDefaultConfig()
@@ -30,6 +34,10 @@ class Config(val plugin: Plugin) {
         inviteRange = configFile.getInt("invite_range")
         spawnLocation = configFile.getString("spawn_location")!!
         homeLimit = configFile.getInt("home_limit")
+        spawnCost = configFile.getInt("spawn_cost")
+        homeCost = configFile.getInt("home_cost")
+        inviteCost = configFile.getInt("invite_cost")
+        acceptCost = configFile.getInt("accept_cost")
     }
 
     fun setSpawnLocation(location: Location) {
@@ -50,6 +58,10 @@ class Config(val plugin: Plugin) {
         plugin.config.addDefault("invite_range", 20)
         plugin.config.addDefault("tpr_radius", 1000)
         plugin.config.addDefault("tpr_attempts", 50)
+        plugin.config.addDefault("spawn_cost", 4)
+        plugin.config.addDefault("home_cost", 8)
+        plugin.config.addDefault("invite_cost", 12)
+        plugin.config.addDefault("accept_cost", 12)
         plugin.config.options().copyDefaults(true)
         plugin.saveConfig()
     }
