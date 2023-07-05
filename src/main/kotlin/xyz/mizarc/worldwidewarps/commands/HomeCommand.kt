@@ -7,7 +7,7 @@ import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Dependency
 import org.bukkit.entity.Player
 import xyz.mizarc.worldwidewarps.Config
-import xyz.mizarc.worldwidewarps.PlayerContainer
+import xyz.mizarc.worldwidewarps.PlayerRepository
 import xyz.mizarc.worldwidewarps.Teleporter
 
 @CommandAlias("home")
@@ -15,7 +15,7 @@ import xyz.mizarc.worldwidewarps.Teleporter
 class HomeCommand: BaseCommand() {
     @Dependency lateinit var config: Config
     @Dependency lateinit var teleporter: Teleporter
-    @Dependency lateinit var playerContainer: PlayerContainer
+    @Dependency lateinit var playerRepository: PlayerRepository
 
     @Default
     fun onHome(player: Player) {

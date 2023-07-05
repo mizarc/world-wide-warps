@@ -19,7 +19,7 @@ import xyz.mizarc.worldwidewarps.utils.lore
 import xyz.mizarc.worldwidewarps.utils.name
 import xyz.mizarc.worldwidewarps.utils.toBed
 
-class BedMenu(private val homes: HomeContainer, private val playerState: PlayerState,
+class BedMenu(private val homes: HomeRepository, private val playerState: PlayerState,
               private val homeBuilder: Home.Builder) {
     fun openHomeSelectionMenu() {
         // Create homes menu

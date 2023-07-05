@@ -10,11 +10,11 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 import xyz.mizarc.worldwidewarps.utils.LocationConversions
 
-class Teleporter(private val plugin: Plugin, private val config: Config, private val playerContainer: PlayerContainer) {
+class Teleporter(private val plugin: Plugin, private val config: Config, private val playerRepository: PlayerRepository) {
 
     fun teleportHome(player: Player): Boolean {
         val homeLocation = player.bedSpawnLocation ?: return false
-        val playerState = playerContainer.getByPlayer(player) ?: return false
+        val playerState = playerRepository.getByPlayer(player) ?: return false
 
         // Do cost checks if required
         if (playerState.getHomeTeleportCost() > 1) {
@@ -42,7 +42,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
 
     fun teleportSpawn(player: Player): Boolean {
         val spawnLocation = LocationConversions.stringTolocation(config.spawnLocation) ?: return false
-        val playerState = playerContainer.getByPlayer(player) ?: return false
+        val playerState = playerRepository.getByPlayer(player) ?: return false
 
         // Do cost checks if required
         if (playerState.getSpawnTeleportCost() > 1) {
@@ -70,7 +70,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
 
     fun teleport(player: Player, location: Location, timer: Int = 0,
                  teleportMessage: TeleportMessage = TeleportMessage.NONE, teleportCost: Int = 0): Boolean {
-        val playerState = playerContainer.getByPlayer(player) ?: return false
+        val playerState = playerRepository.getByPlayer(player) ?: return false
 
         // Teleports the player instantaneously
         if (timer == 0) {

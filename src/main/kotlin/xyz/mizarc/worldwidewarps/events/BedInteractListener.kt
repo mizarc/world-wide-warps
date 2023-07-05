@@ -17,7 +17,7 @@ import org.bukkit.util.Vector
 import xyz.mizarc.worldwidewarps.*
 import xyz.mizarc.worldwidewarps.menus.BedMenu
 
-class BedInteractListener(private val homes: HomeContainer, private val players: PlayerContainer): Listener {
+class BedInteractListener(private val homes: HomeRepository, private val players: PlayerRepository): Listener {
     @EventHandler
     fun onBedShiftClick(event: PlayerBedEnterEvent) {
         // Prevent player from sleeping on someone else's bed

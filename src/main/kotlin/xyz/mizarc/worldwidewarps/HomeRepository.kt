@@ -6,7 +6,7 @@ import org.bukkit.DyeColor
 import java.util.*
 import kotlin.collections.ArrayList
 
-class HomeContainer(private val database: Database, private val players: PlayerContainer) {
+class HomeRepository(private val database: Database, private val players: PlayerRepository) {
     private val homes = ArrayList<Home>()
 
     fun getAll(): ArrayList<Home> {

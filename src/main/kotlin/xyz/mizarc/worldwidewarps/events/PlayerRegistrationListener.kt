@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.mizarc.worldwidewarps.*
 
-class PlayerRegistrationListener(val homes: HomeContainer, val players: PlayerContainer,
+class PlayerRegistrationListener(val homes: HomeRepository, val players: PlayerRepository,
                                  val config: Config, val metadata: Chat): Listener {
 
     @EventHandler

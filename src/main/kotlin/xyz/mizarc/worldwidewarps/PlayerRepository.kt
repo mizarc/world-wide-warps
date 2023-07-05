@@ -4,7 +4,7 @@ import org.bukkit.entity.Player
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PlayerContainer {
+class PlayerRepository {
     var playerStates: ArrayList<PlayerState> = ArrayList()
 
     fun getAll(): ArrayList<PlayerState> {

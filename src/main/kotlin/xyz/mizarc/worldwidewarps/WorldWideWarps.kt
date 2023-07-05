@@ -17,8 +17,8 @@ class WorldWideWarps: JavaPlugin() {
     private lateinit var metadata: Chat
     private val config = Config(this)
     private val storage = DatabaseStorage(this)
-    val players = PlayerContainer()
-    val homes = HomeContainer(storage.connection, players)
+    val players = PlayerRepository()
+    val homes = HomeRepository(storage.connection, players)
     val teleporter = Teleporter(this, config, players)
 
     override fun onEnable() {
@@ -41,7 +41,7 @@ class WorldWideWarps: JavaPlugin() {
     private fun registerDependencies() {
         commandManager.registerDependency(Config::class.java, config)
         commandManager.registerDependency(DatabaseStorage::class.java, storage)
-        commandManager.registerDependency(PlayerContainer::class.java, players)
+        commandManager.registerDependency(PlayerRepository::class.java, players)
         commandManager.registerDependency(Teleporter::class.java, teleporter)
     }
 
