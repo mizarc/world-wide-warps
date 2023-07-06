@@ -58,7 +58,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
         pane.addItem(guisSeparator, 1, 0)
 
         // Add existing homes to menu
-        val playerHomes = homes.getByPlayer(playerState)
+        val playerHomes = homes.getByPlayer(playerState.player)
         if (playerHomes.isNotEmpty()) {
             for (i in 0 until playerHomes.count()) {
                 val home = playerHomes[i]
@@ -195,7 +195,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
     }
 
     private fun isHomeAlreadySet(position: Position): Boolean {
-        val playerHomes = homes.getByPlayer(playerState)
+        val playerHomes = homes.getByPlayer(playerState.player)
         for (home in playerHomes) {
             if (position == home.position) {
                 return true
