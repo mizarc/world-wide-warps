@@ -15,8 +15,9 @@ class WorldWideWarps: JavaPlugin() {
     private val config = Config(this)
     private val storage = DatabaseStorage(this)
     val players = PlayerRepository()
-    val homes = HomeRepository(storage.connection, players)
-    val warps = WarpRepository(storage.connection)
+    val homeRepository = HomeRepository(storage.connection, players)
+    val warpRepository = WarpRepository(storage.connection)
+    val warpAccessRepository = WarpAccessRepository(storage.connection, warpRepository)
     val teleporter = Teleporter(this, config, players)
 
     override fun onEnable() {
@@ -25,7 +26,9 @@ class WorldWideWarps: JavaPlugin() {
         metadata = serviceProvider.provider
         commandManager = PaperCommandManager(this)
         dataFolder.mkdir()
-        homes.getAll()
+        homeRepository.init()
+        warpRepository.init()
+        warpAccessRepository.init()
         registerDependencies()
         registerCommands()
         registerEvents()
@@ -50,10 +53,10 @@ class WorldWideWarps: JavaPlugin() {
     }
 
     private fun registerEvents() {
-        server.pluginManager.registerEvents(PlayerRegistrationListener(homes, players, config, metadata), this)
+        server.pluginManager.registerEvents(PlayerRegistrationListener(homeRepository, players, config, metadata), this)
         server.pluginManager.registerEvents(TeleportCancelListener(players), this)
-        server.pluginManager.registerEvents(BedInteractListener(homes, players), this)
-        server.pluginManager.registerEvents(BedDestructionListener(homes), this)
-        server.pluginManager.registerEvents(WarpInteractListener(warps), this)
+        server.pluginManager.registerEvents(BedInteractListener(homeRepository, players), this)
+        server.pluginManager.registerEvents(BedDestructionListener(homeRepository), this)
+        server.pluginManager.registerEvents(WarpInteractListener(warpRepository), this)
     }
 }
