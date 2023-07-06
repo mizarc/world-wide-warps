@@ -49,7 +49,7 @@ class WarpRepository(private val database: Database) {
         database.executeInsert("INSERT INTO warps (id, playerId, name, worldId, " +
                 "positionX, positionY, positionZ, direction) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
             warp.id, warp.player.uniqueId, warp.name, warp.world.uid,
-            warp.position.x, warp.position.y, warp.position.z, warp.direction)
+            warp.position.x, warp.position.y, warp.position.z, warp.direction.ordinal)
     }
 
     fun update(warp: Warp) {
