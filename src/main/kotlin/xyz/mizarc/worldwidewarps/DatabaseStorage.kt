@@ -13,6 +13,8 @@ class DatabaseStorage(plugin: Plugin) {
         val options = DatabaseOptions.builder().sqlite(plugin.dataFolder.toString() + "/homes.db").build()
         connection = PooledDatabaseOptions.builder().options(options).createHikariDatabase()
         createHomesDatabase()
+        createWarpDatabase()
+        createWarpAccessDatabase()
     }
 
     /**
@@ -24,6 +26,26 @@ class DatabaseStorage(plugin: Plugin) {
             connection.executeUpdate("CREATE TABLE IF NOT EXISTS homes (id TEXT, playerId TEXT, name TEXT, " +
                     "colour TEXT, worldId TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER, " +
                     "direction INT);")
+            true
+        } catch (except: SQLException) {
+            false
+        }
+    }
+
+    private fun createWarpDatabase(): Boolean {
+        return try {
+            connection.executeUpdate("CREATE TABLE IF NOT EXISTS warps (id TEXT, playerId TEXT, name TEXT, " +
+                    "worldId TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER, direction INT);")
+            true
+        } catch (except: SQLException) {
+            false
+        }
+    }
+
+    private fun createWarpAccessDatabase(): Boolean {
+        return try {
+            connection.executeUpdate("CREATE TABLE IF NOT EXISTS warps_access (id TEXT, playerId TEXT, " +
+                    "warpId TEXT);")
             true
         } catch (except: SQLException) {
             false

@@ -27,6 +27,16 @@ class WarpRepository(private val database: Database, private val players: Player
         return foundWarps
     }
 
+    fun getById(): Warp? {
+            val result = database.getFirstRow("SELECT * FROM warps WHERE id=?;")
+            val world = Bukkit.getWorld(UUID.fromString(result.getString("worldId"))) ?: return null
+            return Warp(UUID.fromString(result.getString("id")),
+                    Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
+                    result.getString("name"), world,
+                    Position(result.getInt("positionX"), result.getInt("positionY"),
+                        result.getInt("positionZ")), Direction.values()[result.getInt("direction")])
+    }
+
     fun getByPlayer(playerState: PlayerState): ArrayList<Warp> {
         val foundWarps = ArrayList<Warp>()
         for (warp in warps) {
