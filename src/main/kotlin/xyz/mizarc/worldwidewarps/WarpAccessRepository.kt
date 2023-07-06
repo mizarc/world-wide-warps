@@ -7,34 +7,32 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class WarpAccessRepository(private val database: Database, private val warpRepository: WarpRepository) {
+    private val player_accesses: MutableMap<UUID, ArrayList<Warp>> = mutableMapOf()
+    private val warp_players: MutableMap<UUID, ArrayList<OfflinePlayer>> = mutableMapOf()
 
-    fun getByPlayer(player: OfflinePlayer): ArrayList<Warp> {
-        val foundWarps = ArrayList<Warp>()
+    fun init() {
+        database.executeUpdate("CREATE TABLE IF NOT EXISTS warps_access (id TEXT, playerId TEXT, warpId TEXT);")
 
-        if (foundWarps.isEmpty()) {
-            val results = database.getResults("SELECT warpId FROM warp_access WHERE playerId=?",
-                player.uniqueId)
-
-            for (result in results) {
-                val warp = warpRepository.getById() ?: continue
-                foundWarps.add(warp)
-            }
+        val results = database.getResults("SELECT * FROM warp_access;")
+        for (result in results) {
+            val warp = warpRepository.getById(UUID.fromString(result.getString("warpId"))) ?: continue
+            val player = Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId")))
+            player_accesses.getOrPut(player.uniqueId) { arrayListOf() }.add(warp)
+            warp_players.getOrPut(warp.id) { arrayListOf() }.add(player)
         }
-        return foundWarps
     }
 
-    fun getByWarp(warp: Warp): ArrayList<OfflinePlayer> {
-        val foundPlayers = ArrayList<OfflinePlayer>()
+    fun getByPlayer(player: OfflinePlayer): List<Warp> {
+        return player_accesses[player.uniqueId]?.toList() ?: return listOf()
+    }
 
-        val results = database.getResults("SELECT playerId FROM warp_access WHERE warpId=?")
-        for (result in results) {
-            val player = Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId")))
-            foundPlayers.add(player)
-        }
-        return foundPlayers
+    fun getByWarp(warp: Warp): List<OfflinePlayer> {
+        return warp_players[warp.id]?.toList() ?: return listOf()
     }
 
     fun addWarpForPlayer(player: OfflinePlayer, warp: Warp) {
+        player_accesses.getOrPut(player.uniqueId) { arrayListOf() }.add(warp)
+        warp_players.getOrPut(warp.id) { arrayListOf() }.add(player)
         database.executeInsert("INSERT INTO warps (id, playerId, name, worldId, " +
                 "positionX, positionY, positionZ, direction) VALUES (?, ?, ?)",
             warp.id, warp.player.uniqueId, warp.name, warp.world.uid,
@@ -42,6 +40,8 @@ class WarpAccessRepository(private val database: Database, private val warpRepos
     }
 
     fun removeWarpForPlayer(player: OfflinePlayer, warp: Warp) {
+        player_accesses[player.uniqueId]?.remove(warp) ?: return
+        warp_players[warp.id]?.remove(player) ?: return
         database.executeUpdate("DELETE FROM warp_access WHERE playerId=? AND warpId=?", warp.id)
     }
 }

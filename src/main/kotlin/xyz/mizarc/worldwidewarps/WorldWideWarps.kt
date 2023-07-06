@@ -7,10 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import xyz.mizarc.worldwidewarps.commands.HomeCommand
 import xyz.mizarc.worldwidewarps.commands.SetspawnCommand
 import xyz.mizarc.worldwidewarps.commands.SpawnCommand
-import xyz.mizarc.worldwidewarps.events.BedDestructionListener
-import xyz.mizarc.worldwidewarps.events.BedInteractListener
-import xyz.mizarc.worldwidewarps.events.PlayerRegistrationListener
-import xyz.mizarc.worldwidewarps.events.TeleportCancelListener
+import xyz.mizarc.worldwidewarps.events.*
 
 class WorldWideWarps: JavaPlugin() {
     private lateinit var commandManager: PaperCommandManager
@@ -19,6 +16,7 @@ class WorldWideWarps: JavaPlugin() {
     private val storage = DatabaseStorage(this)
     val players = PlayerRepository()
     val homes = HomeRepository(storage.connection, players)
+    val warps = WarpRepository(storage.connection)
     val teleporter = Teleporter(this, config, players)
 
     override fun onEnable() {
@@ -56,5 +54,6 @@ class WorldWideWarps: JavaPlugin() {
         server.pluginManager.registerEvents(TeleportCancelListener(players), this)
         server.pluginManager.registerEvents(BedInteractListener(homes, players), this)
         server.pluginManager.registerEvents(BedDestructionListener(homes), this)
+        server.pluginManager.registerEvents(WarpInteractListener(warps), this)
     }
 }
