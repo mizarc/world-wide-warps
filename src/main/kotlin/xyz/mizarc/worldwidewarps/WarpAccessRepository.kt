@@ -11,7 +11,7 @@ class WarpAccessRepository(private val database: Database, private val warpRepos
     private val warp_players: MutableMap<UUID, ArrayList<OfflinePlayer>> = mutableMapOf()
 
     fun init() {
-        database.executeUpdate("CREATE TABLE IF NOT EXISTS warps_access (id TEXT, playerId TEXT, warpId TEXT);")
+        database.executeUpdate("CREATE TABLE IF NOT EXISTS warp_access (id TEXT, playerId TEXT, warpId TEXT);")
 
         val results = database.getResults("SELECT * FROM warp_access;")
         for (result in results) {
@@ -33,10 +33,8 @@ class WarpAccessRepository(private val database: Database, private val warpRepos
     fun addWarpForPlayer(player: OfflinePlayer, warp: Warp) {
         player_accesses.getOrPut(player.uniqueId) { arrayListOf() }.add(warp)
         warp_players.getOrPut(warp.id) { arrayListOf() }.add(player)
-        database.executeInsert("INSERT INTO warps (id, playerId, name, worldId, " +
-                "positionX, positionY, positionZ, direction) VALUES (?, ?, ?)",
-            warp.id, warp.player.uniqueId, warp.name, warp.world.uid,
-            warp.position.x, warp.position.y, warp.position.z, warp.direction)
+        database.executeInsert("INSERT INTO warp_access (id, playerId, warpId) VALUES (?, ?, ?)",
+            UUID.randomUUID(), player.uniqueId, warp.id)
     }
 
     fun removeWarpForPlayer(player: OfflinePlayer, warp: Warp) {
