@@ -31,7 +31,7 @@ class Warp(val id: UUID, val player: OfflinePlayer, val name: String, val world:
             this(UUID.randomUUID(), builder.player, builder.name, builder.world, builder.position, builder.direction)
 
     class Builder(val player: Player, val world: World, val position: Position) {
-        var name = ""
+        var name = "Warp"
         var direction = Direction.NORTH
 
         fun name(name: String): Builder {
