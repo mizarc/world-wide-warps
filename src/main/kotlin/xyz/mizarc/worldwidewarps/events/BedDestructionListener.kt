@@ -18,18 +18,14 @@ class                                                                           
         val bed = event.block.blockData as Bed
         val otherHalf = event.block.getRelative(bed.facing)
 
-        var homesAtPosition = homes.getByPosition(Position(event.block.location))
-        if (homesAtPosition.isNotEmpty()) {
-            for (home in homesAtPosition) {
-                homes.remove(home)
-            }
+        var home = homes.getByPosition(Position(event.block.location))
+        if (home != null) {
+            homes.remove(home)
         }
 
-        homesAtPosition = homes.getByPosition(Position(otherHalf.location))
-        if (homesAtPosition.isNotEmpty()) {
-            for (home in homesAtPosition) {
-                homes.remove(home)
-            }
+        home = homes.getByPosition(Position(otherHalf.location))
+        if (home != null) {
+            homes.remove(home)
         }
     }
 }
