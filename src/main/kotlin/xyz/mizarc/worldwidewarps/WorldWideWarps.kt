@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import xyz.mizarc.worldwidewarps.commands.HomeCommand
 import xyz.mizarc.worldwidewarps.commands.SetspawnCommand
 import xyz.mizarc.worldwidewarps.commands.SpawnCommand
+import xyz.mizarc.worldwidewarps.commands.WarpMenuCommand
 import xyz.mizarc.worldwidewarps.events.*
 
 class WorldWideWarps: JavaPlugin() {
@@ -44,12 +45,14 @@ class WorldWideWarps: JavaPlugin() {
         commandManager.registerDependency(DatabaseStorage::class.java, storage)
         commandManager.registerDependency(PlayerRepository::class.java, players)
         commandManager.registerDependency(Teleporter::class.java, teleporter)
+        commandManager.registerDependency(WarpRepository::class.java, warpRepository)
     }
 
     private fun registerCommands() {
         commandManager.registerCommand(HomeCommand())
         commandManager.registerCommand(SpawnCommand())
         commandManager.registerCommand(SetspawnCommand())
+        commandManager.registerCommand(WarpMenuCommand())
     }
 
     private fun registerEvents() {
