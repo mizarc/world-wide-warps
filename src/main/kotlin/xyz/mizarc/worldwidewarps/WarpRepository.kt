@@ -43,6 +43,10 @@ class WarpRepository(private val database: Database) {
         return warps.values.firstOrNull() { it.position == position }
     }
 
+    fun getByName(name: String): Warp? {
+        return warps.values.firstOrNull() {it.name == name }
+    }
+
     fun add(warp: Warp) {
         warps[warp.id] = warp
         database.executeInsert("INSERT INTO warps (id, playerId, name, worldId, " +

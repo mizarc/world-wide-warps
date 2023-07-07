@@ -15,7 +15,7 @@ import xyz.mizarc.worldwidewarps.utils.name
 class WarpManagementMenu(private val warpRepository: WarpRepository, private val warpBuilder: Warp.Builder) {
 
     fun openWarpManagementMenu() {
-        if (warpRepository.getByPosition(warpBuilder.position).isEmpty()) {
+        if (warpRepository.getByPosition(warpBuilder.position) == null) {
             openWarpCreationMenu()
             return
         }
@@ -36,7 +36,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 
-    fun openWarpNamingMenu() {
+    fun openWarpNamingMenu(existing_name: Boolean = false) {
         // Create homes menu
         val gui = AnvilGui("Naming ${warpBuilder.name}")
 
@@ -48,17 +48,31 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         firstPane.addItem(guiItem, 0, 0)
         gui.firstItemComponent.addPane(firstPane)
 
+        // Add message menu item if name is already taken
+        if (existing_name) {
+            val secondPane = StaticPane(0, 0, 1, 1)
+            val paperItem = ItemStack(Material.PAPER)
+                .name("That name has already been taken")
+            val guiPaperItem = GuiItem(paperItem) { guiEvent -> guiEvent.isCancelled = true }
+            secondPane.addItem(guiPaperItem, 0, 0)
+            gui.secondItemComponent.addPane(secondPane)
+        }
+
         // Add confirm menu item.
-        val secondPane = StaticPane(0, 0, 1, 1)
+        val thirdPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
+            if (warpRepository.getByName(gui.renameText) != null) {
+                openWarpNamingMenu(true)
+                return@GuiItem
+            }
             warpBuilder.name = gui.renameText
             warpRepository.add(warpBuilder.build())
             openWarpEditMenu()
             guiEvent.isCancelled = true
         }
-        secondPane.addItem(confirmGuiItem, 0, 0)
-        gui.resultComponent.addPane(secondPane)
+        thirdPane.addItem(confirmGuiItem, 0, 0)
+        gui.resultComponent.addPane(thirdPane)
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 
