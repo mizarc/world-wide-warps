@@ -14,7 +14,7 @@ import java.util.*
  * @property position The position in the world.
  * @property direction The facing direction
  */
-class Warp(val id: UUID, val player: OfflinePlayer, val name: String, val world: World,
+data class Warp(val id: UUID, val player: OfflinePlayer, var name: String, val world: World,
            val position: Position, val direction: Direction) {
 
     /**

@@ -15,11 +15,13 @@ import xyz.mizarc.worldwidewarps.utils.name
 class WarpManagementMenu(private val warpRepository: WarpRepository, private val warpBuilder: Warp.Builder) {
 
     fun openWarpManagementMenu() {
-        if (warpRepository.getByPosition(warpBuilder.position) == null) {
+        val existingWarp = warpRepository.getByPosition(warpBuilder.position)
+        if (existingWarp == null) {
             openWarpCreationMenu()
             return
         }
-        openWarpEditMenu()
+
+        openWarpEditMenu(existingWarp)
     }
 
     fun openWarpCreationMenu() {
@@ -36,20 +38,14 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 
-    fun openWarpNamingMenu(existing_name: Boolean = false, renaming: Boolean = false) {
+    fun openWarpNamingMenu(existing_name: Boolean = false) {
         // Create homes menu
-        val gui: AnvilGui
-        if (renaming) {
-            gui = AnvilGui("Renaming ${warpBuilder.name}")
-        }
-        else {
-            gui = AnvilGui("Naming ${warpBuilder.name}")
-        }
-
+        val gui = AnvilGui("Naming ${warpBuilder.name}")
 
         // Add lodestone menu item
         val firstPane = StaticPane(0, 0, 1, 1)
         val lodestoneItem = ItemStack(Material.LODESTONE)
+            .name(warpBuilder.name)
             .lore("${warpBuilder.position.x}, ${warpBuilder.position.y}, ${warpBuilder.position.z}")
         val guiItem = GuiItem(lodestoneItem) { guiEvent -> guiEvent.isCancelled = true }
         firstPane.addItem(guiItem, 0, 0)
@@ -70,21 +66,13 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
             warpBuilder.name = gui.renameText
-            if (renaming) {
-                if (warpRepository.getByName(gui.renameText) != null) {
-                    openWarpNamingMenu(existing_name = true, renaming = true)
-                    return@GuiItem
-                }
-                warpRepository.update(warpBuilder.build())
+            if (warpRepository.getByName(gui.renameText) != null) {
+                openWarpNamingMenu(existing_name = true)
+                return@GuiItem
             }
-            else {
-                if (warpRepository.getByName(gui.renameText) != null) {
-                    openWarpNamingMenu(existing_name = true)
-                    return@GuiItem
-                }
-                warpRepository.add(warpBuilder.build())
-            }
-            openWarpEditMenu()
+            val warp = warpBuilder.build()
+            warpRepository.add(warp)
+            openWarpEditMenu(warp)
             guiEvent.isCancelled = true
         }
         thirdPane.addItem(confirmGuiItem, 0, 0)
@@ -92,8 +80,8 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 
-    fun openWarpEditMenu() {
-        val gui = ChestGui(1, "Warp")
+    fun openWarpEditMenu(warp: Warp) {
+        val gui = ChestGui(1, "Warp '${warp.name}'")
         val pane = StaticPane(0, 0, 9, 1)
         gui.addPane(pane)
 
@@ -108,7 +96,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         val renamingItem = ItemStack(Material.NAME_TAG)
             .name("Rename Warp")
             .lore("Renames this warp")
-        val guiRenamingItem = GuiItem(renamingItem) { openWarpNamingMenu(renaming=true) }
+        val guiRenamingItem = GuiItem(renamingItem) { openWarpRenamingMenu(warp) }
         pane.addItem(guiRenamingItem, 2, 0)
 
         // Add direction icon
@@ -132,5 +120,47 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         pane.addItem(guiDeleteItem, 8, 0)
 
         gui.show(warpBuilder.player)
+    }
+
+    fun openWarpRenamingMenu(warp: Warp, existing_name: Boolean = false) {
+        // Create homes menu
+        val gui: AnvilGui = AnvilGui("Renaming Warp")
+
+        // Add lodestone menu item
+        val firstPane = StaticPane(0, 0, 1, 1)
+        val lodestoneItem = ItemStack(Material.LODESTONE)
+            .name(warp.name)
+            .lore("${warpBuilder.position.x}, ${warpBuilder.position.y}, ${warpBuilder.position.z}")
+        val guiItem = GuiItem(lodestoneItem) { guiEvent -> guiEvent.isCancelled = true }
+        firstPane.addItem(guiItem, 0, 0)
+        gui.firstItemComponent.addPane(firstPane)
+
+        // Add message menu item if name is already taken
+        if (existing_name) {
+            val secondPane = StaticPane(0, 0, 1, 1)
+            val paperItem = ItemStack(Material.PAPER)
+                .name("That name has already been taken")
+            val guiPaperItem = GuiItem(paperItem) { guiEvent -> guiEvent.isCancelled = true }
+            secondPane.addItem(guiPaperItem, 0, 0)
+            gui.secondItemComponent.addPane(secondPane)
+        }
+
+        // Add confirm menu item.
+        val thirdPane = StaticPane(0, 0, 1, 1)
+        val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
+        val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
+            val newWarp = warp.copy()
+            warp.name = gui.renameText
+            if (warpRepository.getByName(newWarp.name) != null) {
+                openWarpRenamingMenu(warp, existing_name = true)
+                return@GuiItem
+            }
+            warpRepository.update(warp)
+            openWarpEditMenu(warp)
+            guiEvent.isCancelled = true
+        }
+        thirdPane.addItem(confirmGuiItem, 0, 0)
+        gui.resultComponent.addPane(thirdPane)
+        gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 }
