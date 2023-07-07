@@ -44,4 +44,18 @@ class PlayerState(val player: Player, val config: Config, val metadata: Chat) {
         }
         return config.homeTimer
     }
+
+    fun getWarpTeleportTimer(): Int {
+        if (metadata.getPlayerInfoInteger(player, "warp_teleport_timer", -1) > -1) {
+            return metadata.getPlayerInfoInteger(player, "warp_teleport_timer", -1)
+        }
+        return config.homeTimer
+    }
+
+    fun getWarpTeleportCost(): Int {
+        if (metadata.getPlayerInfoInteger(player, "warp_teleport_cost", -1) > -1) {
+            return metadata.getPlayerInfoInteger(player, "warp_teleport_cost", -1)
+        }
+        return config.homeTimer
+    }
 }
