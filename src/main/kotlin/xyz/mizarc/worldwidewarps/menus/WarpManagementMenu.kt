@@ -3,6 +3,7 @@ package xyz.mizarc.worldwidewarps.menus
 import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.gui.type.AnvilGui
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
+import com.github.stefvanschie.inventoryframework.gui.type.FurnaceGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -89,7 +90,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         val iconEditorItem = ItemStack(Material.LODESTONE)
             .name("Edit Warp Icon")
             .lore("Changes the icon that shows up on the warp list")
-        val guiIconEditorItem = GuiItem(iconEditorItem) { guiEvent -> guiEvent.isCancelled = true }
+        val guiIconEditorItem = GuiItem(iconEditorItem) { openWarpIconMenu(warp) }
         pane.addItem(guiIconEditorItem, 0, 0)
 
         // Add renaming icon
@@ -120,6 +121,35 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         pane.addItem(guiDeleteItem, 8, 0)
 
         gui.show(warpBuilder.player)
+    }
+
+    fun openWarpIconMenu(warp: Warp) {
+        val gui = FurnaceGui("Set Warp Icon")
+        val fuelPane = StaticPane(0, 0, 1, 1)
+
+        // Add info paper menu item
+        val paperItem = ItemStack(Material.PAPER)
+            .name("Place an item in the top slot to set it as the icon")
+            .lore("Don't worry, you'll get the item back")
+        val guiIconEditorItem = GuiItem(paperItem) { guiEvent -> guiEvent.isCancelled = true }
+        fuelPane.addItem(guiIconEditorItem, 0, 0)
+        gui.fuelComponent.addPane(fuelPane)
+
+        // Add confirm menu item
+        val outputPane = StaticPane(0, 0, 1, 1)
+        val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
+        val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
+            val newIcon = gui.ingredientComponent.getItem(0, 0)
+            if (newIcon != null) {
+                warp.icon = newIcon.type
+                warpRepository.update(warp)
+                openWarpEditMenu(warp)
+            }
+            guiEvent.isCancelled = true
+        }
+        outputPane.addItem(confirmGuiItem, 0, 0)
+        gui.outputComponent.addPane(outputPane)
+        gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 
     fun openWarpRenamingMenu(warp: Warp, existing_name: Boolean = false) {
