@@ -2,6 +2,7 @@ package xyz.mizarc.worldwidewarps
 
 import co.aikar.idb.Database
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import java.util.*
 
@@ -10,7 +11,7 @@ class WarpRepository(private val database: Database) {
 
     fun init() {
         database.executeUpdate("CREATE TABLE IF NOT EXISTS warps (id TEXT, playerId TEXT, name TEXT, " +
-                "worldId TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER, direction INT);")
+                "worldId TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER, direction INT, icon TEXT);")
 
         val results = database.getResults("SELECT * FROM warps;")
         for (result in results) {
@@ -23,7 +24,9 @@ class WarpRepository(private val database: Database) {
                     result.getInt("positionX"),
                     result.getInt("positionY"),
                     result.getInt("positionZ")),
-                Direction.values()[result.getInt("direction")])
+                Direction.values()[result.getInt("direction")],
+                Material.valueOf(result.getString("icon"))
+            )
         }
     }
 
@@ -50,18 +53,18 @@ class WarpRepository(private val database: Database) {
     fun add(warp: Warp) {
         warps[warp.id] = warp
         database.executeInsert("INSERT INTO warps (id, playerId, name, worldId, " +
-                "positionX, positionY, positionZ, direction) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                "positionX, positionY, positionZ, direction, icon) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
             warp.id, warp.player.uniqueId, warp.name, warp.world.uid,
-            warp.position.x, warp.position.y, warp.position.z, warp.direction.ordinal)
+            warp.position.x, warp.position.y, warp.position.z, warp.direction.ordinal, warp.icon.name)
     }
 
     fun update(warp: Warp) {
         warps.remove(warp.id)
         warps[warp.id] = warp
         database.executeUpdate("UPDATE warps SET playerId=?, name=?, worldId=?, " +
-                "positionX=?, positionY=?, positionZ=?, direction=? WHERE id=?",
+                "positionX=?, positionY=?, positionZ=?, direction=?, icon=? WHERE id=?",
             warp.player.uniqueId, warp.name, warp.world.uid, warp.position.x, warp.position.y,
-            warp.position.z, warp.direction.ordinal, warp.id)
+            warp.position.z, warp.direction.ordinal, warp.icon.name, warp.id)
         return
     }
 
