@@ -36,9 +36,16 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 
-    fun openWarpNamingMenu(existing_name: Boolean = false) {
+    fun openWarpNamingMenu(existing_name: Boolean = false, renaming: Boolean = false) {
         // Create homes menu
-        val gui = AnvilGui("Naming ${warpBuilder.name}")
+        val gui: AnvilGui
+        if (renaming) {
+            gui = AnvilGui("Renaming ${warpBuilder.name}")
+        }
+        else {
+            gui = AnvilGui("Naming ${warpBuilder.name}")
+        }
+
 
         // Add lodestone menu item
         val firstPane = StaticPane(0, 0, 1, 1)
@@ -62,12 +69,21 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         val thirdPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
-            if (warpRepository.getByName(gui.renameText) != null) {
-                openWarpNamingMenu(true)
-                return@GuiItem
-            }
             warpBuilder.name = gui.renameText
-            warpRepository.add(warpBuilder.build())
+            if (renaming) {
+                if (warpRepository.getByName(gui.renameText) != null) {
+                    openWarpNamingMenu(existing_name = true, renaming = true)
+                    return@GuiItem
+                }
+                warpRepository.update(warpBuilder.build())
+            }
+            else {
+                if (warpRepository.getByName(gui.renameText) != null) {
+                    openWarpNamingMenu(existing_name = true)
+                    return@GuiItem
+                }
+                warpRepository.add(warpBuilder.build())
+            }
             openWarpEditMenu()
             guiEvent.isCancelled = true
         }
@@ -92,7 +108,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         val renamingItem = ItemStack(Material.NAME_TAG)
             .name("Rename Warp")
             .lore("Renames this warp")
-        val guiRenamingItem = GuiItem(renamingItem) { guiEvent -> guiEvent.isCancelled = true }
+        val guiRenamingItem = GuiItem(renamingItem) { openWarpNamingMenu(renaming=true) }
         pane.addItem(guiRenamingItem, 2, 0)
 
         // Add direction icon
