@@ -5,7 +5,6 @@ import org.bukkit.Bukkit
 import org.bukkit.DyeColor
 import org.bukkit.OfflinePlayer
 import java.util.*
-import kotlin.collections.ArrayList
 
 class HomeRepository(private val database: Database, private val players: PlayerRepository) {
     private val homes: MutableMap<UUID, Home> = mutableMapOf()
@@ -40,8 +39,8 @@ class HomeRepository(private val database: Database, private val players: Player
         return homes.values.filter { it.player == player }
     }
 
-    fun getByPosition(position: Position): List<Home> {
-        return homes.values.filter { it.position == position }
+    fun getByPosition(position: Position): Home? {
+        return homes.values.firstOrNull() { it.position == position }
     }
 
     fun add(home: Home) {

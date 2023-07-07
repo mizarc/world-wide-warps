@@ -4,7 +4,6 @@ import co.aikar.idb.Database
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import java.util.*
-import kotlin.collections.ArrayList
 
 class WarpRepository(private val database: Database) {
     private val warps: MutableMap<UUID, Warp> = mutableMapOf()
@@ -40,8 +39,8 @@ class WarpRepository(private val database: Database) {
         return warps.values.filter { it.player == player }
     }
 
-    fun getByPosition(position: Position): List<Warp> {
-        return warps.values.filter { it.position == position }
+    fun getByPosition(position: Position): Warp? {
+        return warps.values.firstOrNull() { it.position == position }
     }
 
     fun add(warp: Warp) {
