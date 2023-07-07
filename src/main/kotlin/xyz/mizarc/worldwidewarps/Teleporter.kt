@@ -68,6 +68,34 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
         return true
     }
 
+    fun teleportWarp(player: Player, warp: Warp): Boolean {
+        val warpLocation = warp.position.toLocation(warp.world)
+        val playerState = playerRepository.getByPlayer(player) ?: return false
+
+        // Do cost checks if required
+        if (playerState.getSpawnTeleportCost() > 1) {
+            // Alert player that they can't teleport if they don't meet the cost
+            if (!hasCostAmount(player, playerState.getHomeTeleportCost())) {
+                player.sendActionBar(Component
+                    .text("You require at least ${playerState.getSpawnTeleportCost()} ender pearls to warp.")
+                    .color(TextColor.color(255, 85, 85)))
+                return false
+            }
+
+            // Teleport player home with cost
+            player.sendActionBar(Component
+                .text("Warping to ${warp.name}. This will cost you ${playerState.getWarpTeleportCost()} ender pearls.")
+                .color(TextColor.color(85, 255, 255)))
+            teleport(player, warpLocation, playerState.getSpawnTeleportTimer(),
+                TeleportMessage.WARP, playerState.getSpawnTeleportCost())
+            return true
+        }
+
+        // Teleport player home without cost
+        teleport(player, warpLocation, playerState.getSpawnTeleportTimer())
+        return true
+    }
+
     fun teleport(player: Player, location: Location, timer: Int = 0,
                  teleportMessage: TeleportMessage = TeleportMessage.NONE, teleportCost: Int = 0): Boolean {
         val playerState = playerRepository.getByPlayer(player) ?: return false
