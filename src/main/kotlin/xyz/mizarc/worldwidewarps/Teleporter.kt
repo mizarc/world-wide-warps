@@ -54,7 +54,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
                 return false
             }
 
-            // Teleport player home with cost
+            // Teleport player to spawn with cost
             player.sendActionBar(Component
                 .text("Teleporting to spawn. This will cost you ${playerState.getSpawnTeleportCost()} ender pearls.")
                 .color(TextColor.color(85, 255, 255)))
@@ -63,7 +63,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
             return true
         }
 
-        // Teleport player home without cost
+        // Teleport player to spawn without cost
         teleport(player, spawnLocation, playerState.getSpawnTeleportTimer())
         return true
     }
@@ -80,22 +80,22 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
             // Alert player that they can't teleport if they don't meet the cost
             if (!hasCostAmount(player, playerState.getHomeTeleportCost())) {
                 player.sendActionBar(Component
-                    .text("You require at least ${playerState.getSpawnTeleportCost()} ender pearls to warp.")
+                    .text("You require at least ${playerState.getWarpTeleportCost()} ender pearls to warp.")
                     .color(TextColor.color(255, 85, 85)))
                 return false
             }
 
-            // Teleport player home with cost
+            // Teleport to warp with cost
             player.sendActionBar(Component
                 .text("Warping to ${warp.name}. This will cost you ${playerState.getWarpTeleportCost()} ender pearls.")
                 .color(TextColor.color(85, 255, 255)))
-            teleport(player, warpLocation, playerState.getSpawnTeleportTimer(),
-                TeleportMessage.WARP, playerState.getSpawnTeleportCost())
+            teleport(player, warpLocation, playerState.getWarpTeleportTimer(),
+                TeleportMessage.WARP, playerState.getWarpTeleportCost())
             return true
         }
 
-        // Teleport player home without cost
-        teleport(player, warpLocation, playerState.getSpawnTeleportTimer())
+        // Teleport to warp without cost
+        teleport(player, warpLocation, playerState.getWarpTeleportCost())
         return true
     }
 
