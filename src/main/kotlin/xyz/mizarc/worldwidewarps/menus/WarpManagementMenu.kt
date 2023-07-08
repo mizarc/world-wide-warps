@@ -12,6 +12,7 @@ import xyz.mizarc.worldwidewarps.Warp
 import xyz.mizarc.worldwidewarps.WarpRepository
 import xyz.mizarc.worldwidewarps.utils.lore
 import xyz.mizarc.worldwidewarps.utils.name
+import kotlin.concurrent.thread
 
 class WarpManagementMenu(private val warpRepository: WarpRepository, private val warpBuilder: Warp.Builder) {
 
@@ -135,6 +136,28 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         fuelPane.addItem(guiIconEditorItem, 0, 0)
         gui.fuelComponent.addPane(fuelPane)
 
+        // Allow item to be placed in slot
+        val inputPane = StaticPane(0, 0, 1, 1)
+        inputPane.setOnClick {guiEvent ->
+            guiEvent.isCancelled = true
+            val temp = guiEvent.cursor
+            val cursor = guiEvent.cursor?.type ?: Material.AIR
+
+            if (cursor == Material.AIR) {
+                inputPane.removeItem(0, 0)
+                gui.update()
+                return@setOnClick
+            }
+
+            inputPane.addItem(GuiItem(ItemStack(cursor)), 0, 0)
+            gui.update()
+            thread(start = true) {
+                Thread.sleep(1)
+                warpBuilder.player.setItemOnCursor(temp)
+            }
+        }
+        gui.ingredientComponent.addPane(inputPane)
+
         // Add confirm menu item
         val outputPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
@@ -154,7 +177,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
 
     fun openWarpRenamingMenu(warp: Warp, existing_name: Boolean = false) {
         // Create homes menu
-        val gui: AnvilGui = AnvilGui("Renaming Warp")
+        val gui = AnvilGui("Renaming Warp")
 
         // Add lodestone menu item
         val firstPane = StaticPane(0, 0, 1, 1)
