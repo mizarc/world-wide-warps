@@ -38,7 +38,7 @@ class WarpMenu(private val warpRepository: WarpRepository, private val teleporte
 
         // Add page item
         val pageItem = ItemStack(Material.PAPER)
-            .name("Page $page of ${ceil(warps.count() / 36.0).toInt()}}")
+            .name("Page $page of ${ceil(warps.count() / 36.0).toInt()}")
         val guiPageItem = GuiItem(pageItem) { guiEvent -> guiEvent.isCancelled = true }
         controlsPane.addItem(guiPageItem, 7, 0)
 
@@ -66,7 +66,11 @@ class WarpMenu(private val warpRepository: WarpRepository, private val teleporte
             val warpItem = ItemStack(warp.icon)
                 .name(warp.name)
                 .lore("${warp.position.x}, ${warp.position.y}, ${warp.position.z}")
-            val guiWarpItem = GuiItem(warpItem) { teleporter.teleportWarp(player, warp) }
+            val guiWarpItem = GuiItem(warpItem) {guiEvent ->
+                teleporter.teleportWarp(player, warp)
+                player.closeInventory()
+                guiEvent.isCancelled = true
+            }
             warpsPane.addItem(guiWarpItem, xSlot, ySlot)
 
             // Increment slot
