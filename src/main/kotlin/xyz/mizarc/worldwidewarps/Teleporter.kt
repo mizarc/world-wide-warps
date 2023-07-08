@@ -70,6 +70,9 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
 
     fun teleportWarp(player: Player, warp: Warp): Boolean {
         val warpLocation = warp.position.toLocation(warp.world)
+        warpLocation.x += 0.5
+        warpLocation.y += 1
+        warpLocation.z += 0.5
         val playerState = playerRepository.getByPlayer(player) ?: return false
 
         // Do cost checks if required
@@ -128,7 +131,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
 
     private fun hasCostAmount(player: Player, teleportCost: Int): Boolean {
         var count = 0
-        for (item in player.inventory.contents!!) {
+        for (item in player.inventory.contents) {
             if (item != null && item.type == Material.ENDER_PEARL) {
                 count += item.amount
                 if (count >= teleportCost) {
@@ -141,7 +144,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
 
     private fun removeCostFromInventory(player: Player, teleportCost: Int) {
         var count = teleportCost
-        for (item in player.inventory.contents!!) {
+        for (item in player.inventory.contents) {
             if (item != null && item.type == Material.ENDER_PEARL) {
                 val remaining = player.inventory.removeItem(ItemStack(Material.ENDER_PEARL, teleportCost))
                 count -= remaining[0]?.amount ?: 5
