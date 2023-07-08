@@ -28,34 +28,34 @@ class PlayerState(val player: Player, val config: Config, val metadata: Chat) {
         if (metadata.getPlayerInfoInteger(player, "home_teleport_cost", -1) > -1) {
             return metadata.getPlayerInfoInteger(player, "home_teleport_cost", -1)
         }
-        return config.homeTimer
+        return config.homeCost
     }
 
     fun getSpawnTeleportTimer(): Int {
         if (metadata.getPlayerInfoInteger(player, "spawn_teleport_timer", -1) > -1) {
             return metadata.getPlayerInfoInteger(player, "spawn_teleport_timer", -1)
         }
-        return config.homeTimer
+        return config.spawnTimer
     }
 
     fun getSpawnTeleportCost(): Int {
         if (metadata.getPlayerInfoInteger(player, "spawn_teleport_cost", -1) > -1) {
             return metadata.getPlayerInfoInteger(player, "spawn_teleport_cost", -1)
         }
-        return config.homeTimer
+        return config.spawnCost
     }
 
     fun getWarpTeleportTimer(): Int {
         if (metadata.getPlayerInfoInteger(player, "warp_teleport_timer", -1) > -1) {
             return metadata.getPlayerInfoInteger(player, "warp_teleport_timer", -1)
         }
-        return config.homeTimer
+        return config.warpTimer
     }
 
     fun getWarpTeleportCost(): Int {
         if (metadata.getPlayerInfoInteger(player, "warp_teleport_cost", -1) > -1) {
             return metadata.getPlayerInfoInteger(player, "warp_teleport_cost", -1)
         }
-        return config.homeTimer
+        return config.warpCost
     }
 }
