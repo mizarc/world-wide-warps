@@ -88,7 +88,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         gui.addPane(pane)
 
         // Add icon editor button
-        val iconEditorItem = ItemStack(Material.LODESTONE)
+        val iconEditorItem = ItemStack(warp.icon)
             .name("Edit Warp Icon")
             .lore("Changes the icon that shows up on the warp list")
         val guiIconEditorItem = GuiItem(iconEditorItem) { openWarpIconMenu(warp) }
