@@ -17,8 +17,9 @@ class Config(val plugin: Plugin) {
     var homeLimit = 0
     var spawnCost = 0
     var homeCost = 0
-    var inviteCost = 0
-    var acceptCost = 0
+    var warpCost = 0
+    var warpTimer = 0
+    var warpCooldown = 0
 
     init {
         createDefaultConfig()
@@ -36,8 +37,9 @@ class Config(val plugin: Plugin) {
         homeLimit = configFile.getInt("home_limit")
         spawnCost = configFile.getInt("spawn_cost")
         homeCost = configFile.getInt("home_cost")
-        inviteCost = configFile.getInt("invite_cost")
-        acceptCost = configFile.getInt("accept_cost")
+        warpCost = configFile.getInt("warp_cost")
+        warpTimer = configFile.getInt("warp_timer")
+        warpCooldown = configFile.getInt("warp_cooldown")
     }
 
     fun setSpawnLocation(location: Location) {
