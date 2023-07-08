@@ -130,24 +130,20 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
     }
 
     private fun hasCostAmount(player: Player, teleportCost: Int): Boolean {
-        var count = 0
-        for (item in player.inventory.contents) {
-            if (item != null && item.type == Material.ENDER_PEARL) {
-                count += item.amount
-                if (count >= teleportCost) {
-                    return true
-                }
-            }
+        // Doesn't compile without non-null assertion for some reason. Don't remove it.
+        val count = player.inventory.contents!!.sumOf { item ->
+            if (item?.type == Material.ENDER_PEARL) item.amount else 0
         }
-        return false
+        return count >= teleportCost
     }
 
     private fun removeCostFromInventory(player: Player, teleportCost: Int) {
         var count = teleportCost
-        for (item in player.inventory.contents) {
-            if (item != null && item.type == Material.ENDER_PEARL) {
+        // Doesn't compile without non-null assertion for some reason. Don't remove it.
+        player.inventory.contents!!.forEach {
+            if (it?.type == Material.ENDER_PEARL) {
                 val remaining = player.inventory.removeItem(ItemStack(Material.ENDER_PEARL, teleportCost))
-                count -= remaining[0]?.amount ?: 5
+                count -= remaining[0]?.amount ?: teleportCost
                 if (count <= 0) {
                     return
                 }
