@@ -50,7 +50,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
 
     fun openWarpNamingMenu(existing_name: Boolean = false) {
         // Create homes menu
-        val gui = AnvilGui("Naming ${warpBuilder.name}")
+        val gui = AnvilGui("Naming Warp")
 
         // Add lodestone menu item
         val firstPane = StaticPane(0, 0, 1, 1)
