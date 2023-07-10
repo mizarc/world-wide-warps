@@ -45,7 +45,7 @@ class BedInteractListener(private val homes: HomeRepository, private val players
 
         // Set player's view to align with the bed
         val bed = event.bed.blockData as Bed
-        val direction = Direction.fromVector(bed.facing.direction)
+        val direction = Direction.fromVector(bed.facing.oppositeFace.direction)
         val newLocation = event.bed.location
         newLocation.pitch = 0.0f
         newLocation.yaw = Direction.toYaw(direction)
