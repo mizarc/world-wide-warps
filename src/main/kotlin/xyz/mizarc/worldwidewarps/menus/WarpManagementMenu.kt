@@ -170,13 +170,18 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         val outputPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
+            guiEvent.isCancelled = true
             val newIcon = gui.ingredientComponent.getItem(0, 0)
+
+            // Set icon if item in slot
             if (newIcon != null) {
                 warp.icon = newIcon.type
                 warpRepository.update(warp)
                 openWarpEditMenu(warp)
             }
-            guiEvent.isCancelled = true
+
+            // Go back to edit menu if no item in slot
+            openWarpEditMenu(warp)
         }
         outputPane.addItem(confirmGuiItem, 0, 0)
         gui.outputComponent.addPane(outputPane)
@@ -210,12 +215,19 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         val thirdPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
-            val newWarp = warp.copy()
-            warp.name = gui.renameText
-            if (warpRepository.getByName(newWarp.name) != null) {
+            // Go back to edit menu if the name hasn't changed
+            if (gui.renameText == warp.name) {
+                openWarpEditMenu(warp)
+                return@GuiItem
+            }
+
+            // Stay on menu if the name is already taken
+            if (warpRepository.getByName(gui.renameText) != null) {
                 openWarpRenamingMenu(warp, existingName = true)
                 return@GuiItem
             }
+
+            warp.name = gui.renameText
             warpRepository.update(warp)
             openWarpEditMenu(warp)
             guiEvent.isCancelled = true
@@ -279,6 +291,14 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
             openWarpEditMenu(warp)
         }
         gui.contentsComponent.addPane(westLabel)
+
+        val infoPane = StaticPane(1, 1, 1, 1)
+        val lodestoneItem = ItemStack(Material.NETHER_STAR)
+            .name("Current Direction: ")
+            .lore(warp.direction.name)
+        val guiItem = GuiItem(lodestoneItem) { openWarpEditMenu(warp) }
+        infoPane.addItem(guiItem, 0, 0)
+        gui.contentsComponent.addPane(infoPane)
 
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
