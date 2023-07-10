@@ -47,7 +47,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
         // Do cost checks if required
         if (playerState.getSpawnTeleportCost() > 1) {
             // Alert player that they can't teleport if they don't meet the cost
-            if (!hasCostAmount(player, playerState.getHomeTeleportCost())) {
+            if (!hasCostAmount(player, playerState.getSpawnTeleportCost())) {
                 player.sendActionBar(Component
                     .text("You require at least ${playerState.getSpawnTeleportCost()} ender pearls to teleport to spawn.")
                     .color(TextColor.color(255, 85, 85)))
@@ -79,7 +79,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
         // Do cost checks if required
         if (playerState.getSpawnTeleportCost() > 1) {
             // Alert player that they can't teleport if they don't meet the cost
-            if (!hasCostAmount(player, playerState.getHomeTeleportCost())) {
+            if (!hasCostAmount(player, playerState.getWarpTeleportCost())) {
                 player.sendActionBar(Component
                     .text("You require at least ${playerState.getWarpTeleportCost()} ender pearls to warp.")
                     .color(TextColor.color(255, 85, 85)))
