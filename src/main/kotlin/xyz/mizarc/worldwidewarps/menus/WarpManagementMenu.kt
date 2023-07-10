@@ -1,13 +1,17 @@
 package xyz.mizarc.worldwidewarps.menus
 
+import com.github.stefvanschie.inventoryframework.font.util.Font
 import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.gui.type.AnvilGui
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
+import com.github.stefvanschie.inventoryframework.gui.type.DispenserGui
 import com.github.stefvanschie.inventoryframework.gui.type.FurnaceGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
+import com.github.stefvanschie.inventoryframework.pane.component.Label
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import xyz.mizarc.worldwidewarps.Direction
 import xyz.mizarc.worldwidewarps.Warp
 import xyz.mizarc.worldwidewarps.WarpAccessRepository
 import xyz.mizarc.worldwidewarps.WarpRepository
@@ -108,7 +112,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         val directionItem = ItemStack(Material.COMPASS)
             .name("Change Facing Direction")
             .lore("Renames this warp")
-        val guiDirectionItem = GuiItem(directionItem) { guiEvent -> guiEvent.isCancelled = true }
+        val guiDirectionItem = GuiItem(directionItem) { openWarpDirectionMenu(warp) }
         pane.addItem(guiDirectionItem, 4, 0)
 
         // Add player count icon
@@ -178,7 +182,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 
-    fun openWarpRenamingMenu(warp: Warp, existing_name: Boolean = false) {
+    fun openWarpRenamingMenu(warp: Warp, existingName: Boolean = false) {
         // Create homes menu
         val gui = AnvilGui("Renaming Warp")
 
@@ -192,7 +196,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         gui.firstItemComponent.addPane(firstPane)
 
         // Add message menu item if name is already taken
-        if (existing_name) {
+        if (existingName) {
             val secondPane = StaticPane(0, 0, 1, 1)
             val paperItem = ItemStack(Material.PAPER)
                 .name("That name has already been taken")
@@ -208,7 +212,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
             val newWarp = warp.copy()
             warp.name = gui.renameText
             if (warpRepository.getByName(newWarp.name) != null) {
-                openWarpRenamingMenu(warp, existing_name = true)
+                openWarpRenamingMenu(warp, existingName = true)
                 return@GuiItem
             }
             warpRepository.update(warp)
@@ -217,6 +221,64 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         }
         thirdPane.addItem(confirmGuiItem, 0, 0)
         gui.resultComponent.addPane(thirdPane)
+        gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
+    }
+
+    fun openWarpDirectionMenu(warp: Warp) {
+        val gui = DispenserGui("Select Direction")
+
+        // Add North item
+        val northLabel = Label(1, 0, 1, 1, Font.QUARTZ)
+        northLabel.setText("N") { _, item ->
+            item.name("North")
+            GuiItem(item)
+        }
+        northLabel.setOnClick {
+            warp.direction = Direction.NORTH
+            warpRepository.update(warp)
+            openWarpEditMenu(warp)
+        }
+        gui.contentsComponent.addPane(northLabel)
+
+        // Add South item
+        val southLabel = Label(1, 2, 1, 1, Font.QUARTZ)
+        southLabel.setText("S") { _, item ->
+            item.name("South")
+            GuiItem(item)
+        }
+        southLabel.setOnClick {
+            warp.direction = Direction.SOUTH
+            warpRepository.update(warp)
+            openWarpEditMenu(warp)
+        }
+        gui.contentsComponent.addPane(southLabel)
+
+        // Add East item
+        val eastLabel = Label(2, 1, 1, 1, Font.QUARTZ)
+        eastLabel.setText("E") { _, item ->
+            item.name("East")
+            GuiItem(item)
+        }
+        eastLabel.setOnClick {
+            warp.direction = Direction.EAST
+            warpRepository.update(warp)
+            openWarpEditMenu(warp)
+        }
+        gui.contentsComponent.addPane(eastLabel)
+
+        // Add West item
+        val westLabel = Label(0, 1, 1, 1, Font.QUARTZ)
+        westLabel.setText("W") { _, item ->
+            item.name("West")
+            GuiItem(item)
+        }
+        westLabel.setOnClick {
+            warp.direction = Direction.WEST
+            warpRepository.update(warp)
+            openWarpEditMenu(warp)
+        }
+        gui.contentsComponent.addPane(westLabel)
+
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
     }
 }

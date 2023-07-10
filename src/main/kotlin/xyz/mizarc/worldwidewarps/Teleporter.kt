@@ -73,6 +73,7 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
         warpLocation.x += 0.5
         warpLocation.y += 1
         warpLocation.z += 0.5
+        warpLocation.direction = Direction.toVector(warp.direction)
         val playerState = playerRepository.getByPlayer(player) ?: return false
 
         // Do cost checks if required

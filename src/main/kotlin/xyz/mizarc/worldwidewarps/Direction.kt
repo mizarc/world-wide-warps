@@ -21,6 +21,15 @@ enum class Direction {
             }
         }
 
+        fun toVector(direction: Direction): Vector {
+            return when(direction) {
+                NORTH -> Vector(0, 0, -1)
+                SOUTH -> Vector(0, 0, 1)
+                EAST -> Vector(1, 0, 0)
+                WEST -> Vector(-1, 0, 0)
+            }
+        }
+
         fun toYaw(direction: Direction): Float {
             return when(direction) {
                 NORTH -> 180f

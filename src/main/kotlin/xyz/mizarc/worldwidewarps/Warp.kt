@@ -17,7 +17,7 @@ import javax.swing.Icon
  * @property direction The facing direction
  */
 data class Warp(val id: UUID, val player: OfflinePlayer, var name: String, val world: World,
-           val position: Position, val direction: Direction, var icon: Material) {
+           val position: Position, var direction: Direction, var icon: Material) {
 
     /**
      * Used to create a new warp instance with an auto generated UUID.
