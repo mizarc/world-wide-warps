@@ -9,12 +9,15 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.mizarc.worldwidewarps.Warp
+import xyz.mizarc.worldwidewarps.WarpAccessRepository
 import xyz.mizarc.worldwidewarps.WarpRepository
 import xyz.mizarc.worldwidewarps.utils.lore
 import xyz.mizarc.worldwidewarps.utils.name
 import kotlin.concurrent.thread
 
-class WarpManagementMenu(private val warpRepository: WarpRepository, private val warpBuilder: Warp.Builder) {
+class WarpManagementMenu(private val warpRepository: WarpRepository,
+                         private val warpAccessRepository: WarpAccessRepository,
+                         private val warpBuilder: Warp.Builder) {
 
     fun openWarpManagementMenu() {
         val existingWarp = warpRepository.getByPosition(warpBuilder.position)
@@ -111,7 +114,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository, private val
         // Add player count icon
         val playerCountItem = ItemStack(Material.PLAYER_HEAD)
             .name("Player Count:")
-            .lore("")
+            .lore("${warpAccessRepository.getByWarp(warp).count()}")
         val guiPlayerCountItem = GuiItem(playerCountItem) { guiEvent -> guiEvent.isCancelled = true }
         pane.addItem(guiPlayerCountItem, 6, 0)
 

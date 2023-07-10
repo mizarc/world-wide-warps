@@ -22,6 +22,10 @@ class WarpAccessRepository(private val database: Database, private val warpRepos
         }
     }
 
+    fun hasAccess(player: OfflinePlayer, warp: Warp): Boolean {
+        return warpPlayers[warp.id]?.toList()?.contains(player) ?: false
+    }
+
     fun getByPlayer(player: OfflinePlayer): List<Warp> {
         return playerAccesses[player.uniqueId]?.toList() ?: return listOf()
     }
