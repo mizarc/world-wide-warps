@@ -111,7 +111,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         // Add direction icon
         val directionItem = ItemStack(Material.COMPASS)
             .name("Change Facing Direction")
-            .lore("Renames this warp")
+            .lore("Alters the direction players face when they get teleported")
         val guiDirectionItem = GuiItem(directionItem) { openWarpDirectionMenu(warp) }
         pane.addItem(guiDirectionItem, 4, 0)
 
