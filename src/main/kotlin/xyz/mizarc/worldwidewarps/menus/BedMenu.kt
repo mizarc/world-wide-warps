@@ -58,7 +58,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
         pane.addItem(guisSeparator, 1, 0)
 
         // Add existing homes to menu
-        val playerHomes = homes.getByPlayer(playerState)
+        val playerHomes = homes.getByPlayer(playerState.player)
         if (playerHomes.isNotEmpty()) {
             for (i in 0 until playerHomes.count()) {
                 val home = playerHomes[i]
@@ -195,7 +195,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
     }
 
     private fun isHomeAlreadySet(position: Position): Boolean {
-        val playerHomes = homes.getByPlayer(playerState)
+        val playerHomes = homes.getByPlayer(playerState.player)
         for (home in playerHomes) {
             if (position == home.position) {
                 return true
@@ -218,7 +218,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
         // Set player's view to align with the bed
         val sleepingLocation = Location(home.world, home.position.x.toDouble(), home.position.y.toDouble(), home.position.z.toDouble())
         val bed = sleepingLocation.block.blockData as Bed
-        val direction = Direction.fromVector(bed.facing.direction)
+        val direction = Direction.fromVector(bed.facing.oppositeFace.direction)
         player.teleport(Location(home.world, home.position.x.toDouble(), home.position.y.toDouble() + 1, home.position.z.toDouble(), Direction.toYaw(direction), 0.0f))
         GSitAPI.createPose(sleepingLocation.block, player, Pose.SLEEPING,
             0.0, 0.0, 0.0, Direction.toYaw(home.direction), true)

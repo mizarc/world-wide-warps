@@ -47,14 +47,14 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
         // Do cost checks if required
         if (playerState.getSpawnTeleportCost() > 1) {
             // Alert player that they can't teleport if they don't meet the cost
-            if (!hasCostAmount(player, playerState.getHomeTeleportCost())) {
+            if (!hasCostAmount(player, playerState.getSpawnTeleportCost())) {
                 player.sendActionBar(Component
                     .text("You require at least ${playerState.getSpawnTeleportCost()} ender pearls to teleport to spawn.")
                     .color(TextColor.color(255, 85, 85)))
                 return false
             }
 
-            // Teleport player home with cost
+            // Teleport player to spawn with cost
             player.sendActionBar(Component
                 .text("Teleporting to spawn. This will cost you ${playerState.getSpawnTeleportCost()} ender pearls.")
                 .color(TextColor.color(85, 255, 255)))
@@ -63,8 +63,40 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
             return true
         }
 
-        // Teleport player home without cost
+        // Teleport player to spawn without cost
         teleport(player, spawnLocation, playerState.getSpawnTeleportTimer())
+        return true
+    }
+
+    fun teleportWarp(player: Player, warp: Warp): Boolean {
+        val warpLocation = warp.position.toLocation(warp.world)
+        warpLocation.x += 0.5
+        warpLocation.y += 1
+        warpLocation.z += 0.5
+        warpLocation.direction = Direction.toVector(warp.direction)
+        val playerState = playerRepository.getByPlayer(player) ?: return false
+
+        // Do cost checks if required
+        if (playerState.getSpawnTeleportCost() > 1) {
+            // Alert player that they can't teleport if they don't meet the cost
+            if (!hasCostAmount(player, playerState.getWarpTeleportCost())) {
+                player.sendActionBar(Component
+                    .text("You require at least ${playerState.getWarpTeleportCost()} ender pearls to warp.")
+                    .color(TextColor.color(255, 85, 85)))
+                return false
+            }
+
+            // Teleport to warp with cost
+            player.sendActionBar(Component
+                .text("Warping to ${warp.name}. This will cost you ${playerState.getWarpTeleportCost()} ender pearls.")
+                .color(TextColor.color(85, 255, 255)))
+            teleport(player, warpLocation, playerState.getWarpTeleportTimer(),
+                TeleportMessage.WARP, playerState.getWarpTeleportCost())
+            return true
+        }
+
+        // Teleport to warp without cost
+        teleport(player, warpLocation, playerState.getWarpTeleportCost())
         return true
     }
 
@@ -99,24 +131,20 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
     }
 
     private fun hasCostAmount(player: Player, teleportCost: Int): Boolean {
-        var count = 0
-        for (item in player.inventory.contents!!) {
-            if (item != null && item.type == Material.ENDER_PEARL) {
-                count += item.amount
-                if (count >= teleportCost) {
-                    return true
-                }
-            }
+        // Doesn't compile without non-null assertion for some reason. Don't remove it.
+        val count = player.inventory.contents!!.sumOf { item ->
+            if (item?.type == Material.ENDER_PEARL) item.amount else 0
         }
-        return false
+        return count >= teleportCost
     }
 
     private fun removeCostFromInventory(player: Player, teleportCost: Int) {
         var count = teleportCost
-        for (item in player.inventory.contents!!) {
-            if (item != null && item.type == Material.ENDER_PEARL) {
+        // Doesn't compile without non-null assertion for some reason. Don't remove it.
+        player.inventory.contents!!.forEach {
+            if (it?.type == Material.ENDER_PEARL) {
                 val remaining = player.inventory.removeItem(ItemStack(Material.ENDER_PEARL, teleportCost))
-                count -= remaining[0]?.amount ?: 5
+                count -= remaining[0]?.amount ?: teleportCost
                 if (count <= 0) {
                     return
                 }

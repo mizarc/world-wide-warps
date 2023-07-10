@@ -17,8 +17,9 @@ class Config(val plugin: Plugin) {
     var homeLimit = 0
     var spawnCost = 0
     var homeCost = 0
-    var inviteCost = 0
-    var acceptCost = 0
+    var warpCost = 0
+    var warpTimer = 0
+    var warpCooldown = 0
 
     init {
         createDefaultConfig()
@@ -36,8 +37,9 @@ class Config(val plugin: Plugin) {
         homeLimit = configFile.getInt("home_limit")
         spawnCost = configFile.getInt("spawn_cost")
         homeCost = configFile.getInt("home_cost")
-        inviteCost = configFile.getInt("invite_cost")
-        acceptCost = configFile.getInt("accept_cost")
+        warpCost = configFile.getInt("warp_cost")
+        warpTimer = configFile.getInt("warp_timer")
+        warpCooldown = configFile.getInt("warp_cooldown")
     }
 
     fun setSpawnLocation(location: Location) {
@@ -49,19 +51,20 @@ class Config(val plugin: Plugin) {
 
     private fun createDefaultConfig() {
         plugin.config.addDefault("spawn_location" , "")
+        plugin.config.addDefault("spawn_cost", 2)
         plugin.config.addDefault("spawn_timer", 5)
-        plugin.config.addDefault("spawn_cooldown", 30)
-        plugin.config.addDefault("home_default_to_spawn", true)
-        plugin.config.addDefault("home_timer", 5)
-        plugin.config.addDefault("home_cooldown", 30)
+        plugin.config.addDefault("spawn_cooldown", 0)
         plugin.config.addDefault("home_limit", 3)
-        plugin.config.addDefault("invite_range", 20)
+        plugin.config.addDefault("home_cost", 4)
+        plugin.config.addDefault("home_timer", 5)
+        plugin.config.addDefault("home_cooldown", 0)
+        plugin.config.addDefault("home_default_to_spawn", true)
+        plugin.config.addDefault("warp_cost", 8)
+        plugin.config.addDefault("warp_timer", 6)
+        plugin.config.addDefault("warp_cost", 6)
+        plugin.config.addDefault("warp_cooldown", 0)
         plugin.config.addDefault("tpr_radius", 1000)
         plugin.config.addDefault("tpr_attempts", 50)
-        plugin.config.addDefault("spawn_cost", 4)
-        plugin.config.addDefault("home_cost", 8)
-        plugin.config.addDefault("invite_cost", 12)
-        plugin.config.addDefault("accept_cost", 12)
         plugin.config.options().copyDefaults(true)
         plugin.saveConfig()
     }

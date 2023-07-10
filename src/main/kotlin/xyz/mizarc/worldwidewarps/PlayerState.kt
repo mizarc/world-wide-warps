@@ -3,45 +3,29 @@ package xyz.mizarc.worldwidewarps
 import net.milkbowl.vault.chat.Chat
 import org.bukkit.entity.Player
 
-class PlayerState(val player: Player, val config: Config, val metadata: Chat) {
+class PlayerState(val player: Player, private val config: Config, private val metadata: Chat) {
     var teleportTask: TeleportTask? = null
-    var teleportCooldownTimer = 0
-    var invitePlayer: Player? = null
     var isLaying: Boolean = false
     var inBedMenu: Boolean = false
 
-    fun getHomeLimit(): Int {
-        if (metadata.getPlayerInfoInteger(player, "home_limit", -1) > -1) {
-            return metadata.getPlayerInfoInteger(player, "home_limit", -1)
-        }
-        return config.homeLimit
-    }
+    fun getHomeLimit(): Int =
+        metadata.getPlayerInfoInteger(player, "home_limit", config.homeLimit).takeIf { it > -1 } ?: -1
 
-    fun getHomeTeleportTimer(): Int {
-        if (metadata.getPlayerInfoInteger(player, "home_teleport_timer", -1) > -1) {
-            return metadata.getPlayerInfoInteger(player, "home_teleport_timer", -1)
-        }
-        return config.homeTimer
-    }
+    fun getHomeTeleportCost(): Int =
+        metadata.getPlayerInfoInteger(player, "home_teleport_cost", config.homeCost).takeIf { it > -1 } ?: -1
 
-    fun getHomeTeleportCost(): Int {
-        if (metadata.getPlayerInfoInteger(player, "home_teleport_cost", -1) > -1) {
-            return metadata.getPlayerInfoInteger(player, "home_teleport_cost", -1)
-        }
-        return config.homeTimer
-    }
+    fun getHomeTeleportTimer(): Int =
+        metadata.getPlayerInfoInteger(player, "home_teleport_timer", config.homeTimer).takeIf { it > -1 } ?: -1
 
-    fun getSpawnTeleportTimer(): Int {
-        if (metadata.getPlayerInfoInteger(player, "spawn_teleport_timer", -1) > -1) {
-            return metadata.getPlayerInfoInteger(player, "spawn_teleport_timer", -1)
-        }
-        return config.homeTimer
-    }
+    fun getSpawnTeleportCost(): Int =
+        metadata.getPlayerInfoInteger(player, "spawn_teleport_cost", config.spawnCost).takeIf { it > -1 } ?: -1
 
-    fun getSpawnTeleportCost(): Int {
-        if (metadata.getPlayerInfoInteger(player, "spawn_teleport_cost", -1) > -1) {
-            return metadata.getPlayerInfoInteger(player, "spawn_teleport_cost", -1)
-        }
-        return config.homeTimer
-    }
+    fun getSpawnTeleportTimer(): Int =
+        metadata.getPlayerInfoInteger(player, "spawn_teleport_timer", config.spawnTimer).takeIf { it > -1 } ?: -1
+
+    fun getWarpTeleportCost(): Int =
+        metadata.getPlayerInfoInteger(player, "warp_teleport_cost", config.warpCost).takeIf { it > -1 } ?: -1
+
+    fun getWarpTeleportTimer(): Int =
+        metadata.getPlayerInfoInteger(player, "warp_teleport_timer", config.warpTimer).takeIf { it > -1 } ?: -1
 }

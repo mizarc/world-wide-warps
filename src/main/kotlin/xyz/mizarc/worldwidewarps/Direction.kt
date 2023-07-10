@@ -10,14 +10,23 @@ enum class Direction {
 
     companion object {
         fun fromVector(vector: Vector): Direction {
-            return if (vector.z == 1.0) {
+            return if (vector.z == -1.0) {
                 NORTH
-            } else if (vector.z == -1.0) {
+            } else if (vector.z == 1.0) {
                 SOUTH
-            } else if (vector.x == -1.0) {
+            } else if (vector.x == 1.0) {
                 EAST
             } else {
                 WEST
+            }
+        }
+
+        fun toVector(direction: Direction): Vector {
+            return when(direction) {
+                NORTH -> Vector(0, 0, -1)
+                SOUTH -> Vector(0, 0, 1)
+                EAST -> Vector(1, 0, 0)
+                WEST -> Vector(-1, 0, 0)
             }
         }
 

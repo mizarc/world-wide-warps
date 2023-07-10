@@ -39,7 +39,7 @@ class Home(val id: UUID, val player: OfflinePlayer, val name: String, val colour
         var name = ""
         var sleep = true
         lateinit var pose: IGPoseSeat
-        val direction: Direction = Direction.fromVector(bed.facing.direction)
+        val direction: Direction = Direction.fromVector(bed.facing.oppositeFace.direction)
 
         fun name(name: String): Builder {
             this.name = name

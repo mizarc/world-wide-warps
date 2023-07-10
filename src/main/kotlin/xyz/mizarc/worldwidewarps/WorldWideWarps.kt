@@ -7,10 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin
 import xyz.mizarc.worldwidewarps.commands.HomeCommand
 import xyz.mizarc.worldwidewarps.commands.SetspawnCommand
 import xyz.mizarc.worldwidewarps.commands.SpawnCommand
-import xyz.mizarc.worldwidewarps.events.BedDestructionListener
-import xyz.mizarc.worldwidewarps.events.BedInteractListener
-import xyz.mizarc.worldwidewarps.events.PlayerRegistrationListener
-import xyz.mizarc.worldwidewarps.events.TeleportCancelListener
+import xyz.mizarc.worldwidewarps.commands.WarpMenuCommand
+import xyz.mizarc.worldwidewarps.events.*
 
 class WorldWideWarps: JavaPlugin() {
     private lateinit var commandManager: PaperCommandManager
@@ -18,7 +16,9 @@ class WorldWideWarps: JavaPlugin() {
     private val config = Config(this)
     private val storage = DatabaseStorage(this)
     val players = PlayerRepository()
-    val homes = HomeRepository(storage.connection, players)
+    val homeRepository = HomeRepository(storage.connection, players)
+    val warpRepository = WarpRepository(storage.connection)
+    val warpAccessRepository = WarpAccessRepository(storage.connection, warpRepository)
     val teleporter = Teleporter(this, config, players)
 
     override fun onEnable() {
@@ -27,7 +27,9 @@ class WorldWideWarps: JavaPlugin() {
         metadata = serviceProvider.provider
         commandManager = PaperCommandManager(this)
         dataFolder.mkdir()
-        homes.getAll()
+        homeRepository.init()
+        warpRepository.init()
+        warpAccessRepository.init()
         registerDependencies()
         registerCommands()
         registerEvents()
@@ -43,18 +45,22 @@ class WorldWideWarps: JavaPlugin() {
         commandManager.registerDependency(DatabaseStorage::class.java, storage)
         commandManager.registerDependency(PlayerRepository::class.java, players)
         commandManager.registerDependency(Teleporter::class.java, teleporter)
+        commandManager.registerDependency(WarpRepository::class.java, warpRepository)
     }
 
     private fun registerCommands() {
         commandManager.registerCommand(HomeCommand())
         commandManager.registerCommand(SpawnCommand())
         commandManager.registerCommand(SetspawnCommand())
+        commandManager.registerCommand(WarpMenuCommand())
     }
 
     private fun registerEvents() {
-        server.pluginManager.registerEvents(PlayerRegistrationListener(homes, players, config, metadata), this)
+        server.pluginManager.registerEvents(PlayerRegistrationListener(homeRepository, players, config, metadata), this)
         server.pluginManager.registerEvents(TeleportCancelListener(players), this)
-        server.pluginManager.registerEvents(BedInteractListener(homes, players), this)
-        server.pluginManager.registerEvents(BedDestructionListener(homes), this)
+        server.pluginManager.registerEvents(BedInteractListener(homeRepository, players), this)
+        server.pluginManager.registerEvents(BedDestructionListener(homeRepository), this)
+        server.pluginManager.registerEvents(WarpInteractListener(warpRepository, warpAccessRepository), this)
+        server.pluginManager.registerEvents(WarpDestructionListener(warpRepository, warpAccessRepository), this)
     }
 }
