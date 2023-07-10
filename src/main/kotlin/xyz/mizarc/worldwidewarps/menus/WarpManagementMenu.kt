@@ -304,7 +304,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
     }
 
     fun openWarpDeleteMenu(warp: Warp) {
-        val gui = HopperGui("Do you want to delete this warp?")
+        val gui = HopperGui("Delete Warp?")
         val pane = StaticPane(1, 0, 3, 1)
         gui.slotsComponent.addPane(pane)
 
