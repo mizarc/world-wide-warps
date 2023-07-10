@@ -40,6 +40,17 @@ class WarpAccessRepository(private val database: Database, private val warpRepos
     fun removeWarpForPlayer(player: OfflinePlayer, warp: Warp) {
         playerAccesses[player.uniqueId]?.remove(warp) ?: return
         warpPlayers[warp.id]?.remove(player) ?: return
-        database.executeUpdate("DELETE FROM warp_access WHERE playerId=? AND warpId=?", warp.id)
+        database.executeUpdate("DELETE FROM warp_access WHERE playerId=? AND warpId=?", player.uniqueId, warp.id)
+    }
+
+    fun removeAllAccess(warp: Warp) {
+        val foundWarpPlayers = warpPlayers[warp.id] ?: return
+        for (player in foundWarpPlayers) {
+            val foundPlayer = playerAccesses[player.uniqueId] ?: continue
+            foundPlayer.remove(warp)
+            database.executeUpdate("DELETE FROM warp_access WHERE playerId=? AND warpId=?", player.uniqueId, warp.id)
+        }
+
+        warpPlayers.remove(warp.id)
     }
 }
