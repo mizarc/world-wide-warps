@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.gui.type.AnvilGui
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
 import com.github.stefvanschie.inventoryframework.gui.type.DispenserGui
 import com.github.stefvanschie.inventoryframework.gui.type.FurnaceGui
+import com.github.stefvanschie.inventoryframework.gui.type.HopperGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import com.github.stefvanschie.inventoryframework.pane.component.Label
 import org.bukkit.Bukkit
@@ -125,7 +126,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         // Add warp delete icon
         val deleteItem = ItemStack(Material.REDSTONE)
             .name("Delete Warp")
-        val guiDeleteItem = GuiItem(deleteItem) { guiEvent -> guiEvent.isCancelled = true }
+        val guiDeleteItem = GuiItem(deleteItem) { openWarpDeleteMenu(warp) }
         pane.addItem(guiDeleteItem, 8, 0)
 
         gui.show(warpBuilder.player)
@@ -280,5 +281,35 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         gui.contentsComponent.addPane(westLabel)
 
         gui.show(Bukkit.getPlayer(warpBuilder.player.uniqueId)!!)
+    }
+
+    fun openWarpDeleteMenu(warp: Warp) {
+        val gui = HopperGui("Do you want to delete this warp?")
+        val pane = StaticPane(1, 0, 3, 1)
+        gui.slotsComponent.addPane(pane)
+
+        // Add no menu item
+        val noItem = ItemStack(Material.RED_CONCRETE)
+            .name("No")
+            .lore("Take me back")
+        val guiNoItem = GuiItem(noItem) { guiEvent ->
+            guiEvent.isCancelled = true
+            openWarpEditMenu(warp)
+        }
+        pane.addItem(guiNoItem, 0, 0)
+
+        // Add yes menu item
+        val yesItem = ItemStack(Material.GREEN_CONCRETE)
+            .name("Yes")
+            .lore("Warning, this is a permanent action")
+        val guiYesItem = GuiItem(yesItem) { guiEvent ->
+            guiEvent.isCancelled = true
+            warpAccessRepository.removeAllAccess(warp)
+            warpRepository.remove(warp)
+            warpBuilder.player.closeInventory()
+        }
+        pane.addItem(guiYesItem, 2, 0)
+
+        gui.show(warpBuilder.player)
     }
 }
