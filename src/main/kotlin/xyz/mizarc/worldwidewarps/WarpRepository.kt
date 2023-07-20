@@ -43,11 +43,11 @@ class WarpRepository(private val database: Database) {
     }
 
     fun getByPosition(position: Position): Warp? {
-        return warps.values.firstOrNull() { it.position == position }
+        return warps.values.firstOrNull { it.position == position }
     }
 
     fun getByName(name: String): Warp? {
-        return warps.values.firstOrNull() {it.name == name }
+        return warps.values.firstOrNull {it.name == name }
     }
 
     fun add(warp: Warp) {

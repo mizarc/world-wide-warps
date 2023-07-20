@@ -2,6 +2,7 @@ package xyz.mizarc.worldwidewarps.menus
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
+import com.github.stefvanschie.inventoryframework.gui.type.util.Gui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -16,18 +17,27 @@ class WarpMenu(private val warpRepository: WarpRepository, private val teleporte
                private val player: Player) {
     var page = 1
 
-    fun openWarpMenu() {
+    fun openWarpMenu(backCommand: String? = null) {
         val warps = warpRepository.getByPlayer(player)
         val gui = ChestGui(6, "Warps")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
 
         // Add controls pane
         val controlsPane = StaticPane(0, 0, 9, 1)
         gui.addPane(controlsPane)
 
-        // Add go back item
-        val exitItem = ItemStack(Material.NETHER_STAR)
-            .name("Go Back")
-        val guiExitItem = GuiItem(exitItem) { guiEvent -> guiEvent.isCancelled = true }
+        // Add go back/exit item
+        val guiExitItem: GuiItem
+        if (backCommand != null) {
+            val exitItem = ItemStack(Material.NETHER_STAR)
+                .name("Go Back")
+            guiExitItem = GuiItem(exitItem) { player.performCommand(backCommand) }
+        }
+        else {
+            val exitItem = ItemStack(Material.NETHER_STAR)
+                .name("Exit")
+            guiExitItem = GuiItem(exitItem) { player.closeInventory() }
+        }
         controlsPane.addItem(guiExitItem, 0, 0)
 
         // Add prev item
