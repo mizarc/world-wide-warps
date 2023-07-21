@@ -9,11 +9,16 @@ import dev.mizarc.worldwidewarps.WarpAccessRepository
 import dev.mizarc.worldwidewarps.WarpRepository
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
+import org.bukkit.Bukkit
+import org.bukkit.block.Block
+import org.bukkit.event.block.BlockExplodeEvent
+import org.bukkit.event.entity.EntityExplodeEvent
 
 class WarpDestructionListener(val warpRepository: WarpRepository,
                               val warpAccessRepository: WarpAccessRepository): Listener {
     @EventHandler
     fun onWarpBreak(event: BlockBreakEvent) {
+        Bukkit.getLogger().info("oof")
         if (event.block.type != Material.LODESTONE) return
         val warp = warpRepository.getAll().find { it.position == Position(event.block.location) } ?: return
 
@@ -31,5 +36,22 @@ class WarpDestructionListener(val warpRepository: WarpRepository,
         // Deletes the warp
         warpRepository.remove(warp)
         warpAccessRepository.removeAllAccess(warp)
+    }
+
+    @EventHandler
+    fun onBlockExplode(event: BlockExplodeEvent) {
+        explosionHandler(event.blockList())
+    }
+
+    @EventHandler
+    fun onEntityExplode(event: EntityExplodeEvent) {
+        explosionHandler(event.blockList())
+    }
+
+    fun explosionHandler(blocks: MutableList<Block>) {
+        for (block in blocks) {
+            warpRepository.getByPosition(Position(block.location)) ?: continue
+            blocks.remove(block)
+        }
     }
 }
