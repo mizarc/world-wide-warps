@@ -7,17 +7,29 @@ import org.bukkit.event.block.BlockBreakEvent
 import dev.mizarc.worldwidewarps.Position
 import dev.mizarc.worldwidewarps.WarpAccessRepository
 import dev.mizarc.worldwidewarps.WarpRepository
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 
 class WarpDestructionListener(val warpRepository: WarpRepository,
                               val warpAccessRepository: WarpAccessRepository): Listener {
     @EventHandler
     fun onWarpBreak(event: BlockBreakEvent) {
         if (event.block.type != Material.LODESTONE) return
+        val warp = warpRepository.getAll().find { it.position == Position(event.block.location) } ?: return
 
-        val existingWarp = warpRepository.getAll().find { it.position == Position(event.block.location) }
-        if (existingWarp != null) {
-            warpRepository.remove(existingWarp)
-            warpAccessRepository.removeAllAccess(existingWarp)
+        // Send alert to player until the break count limit is hit
+        warp.resetBreakCount()
+        if (warp.breakCount > 1) {
+            warp.breakCount -= 1
+            event.player.sendActionBar(
+                Component.text("Break ${warp.breakCount} more times in 10 seconds to destroy this warp")
+                    .color(TextColor.color(255, 201, 14)))
+            event.isCancelled = true
+            return
         }
+
+        // Deletes the warp
+        warpRepository.remove(warp)
+        warpAccessRepository.removeAllAccess(warp)
     }
 }

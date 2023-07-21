@@ -5,6 +5,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.bukkit.entity.Player
 import java.util.*
+import kotlin.concurrent.thread
 
 /**
  * Stores a warp, a public global teleportation system.
@@ -17,6 +18,9 @@ import java.util.*
  */
 data class Warp(val id: UUID, val player: OfflinePlayer, var name: String, val world: World,
            val position: Position, var direction: Direction, var icon: Material) {
+    val defaultBreakCount = 3
+    var breakCount = 3
+    var breakPeriod = false
 
     /**
      * Used to create a new warp instance with an auto generated UUID.
@@ -44,5 +48,16 @@ data class Warp(val id: UUID, val player: OfflinePlayer, var name: String, val w
         }
 
         fun build() = Warp(this)
+    }
+
+    fun resetBreakCount() {
+        if (!breakPeriod) {
+            thread(start = true) {
+                breakPeriod = true
+                Thread.sleep(10000)
+                breakCount = defaultBreakCount
+                breakPeriod = false
+            }
+        }
     }
 }
