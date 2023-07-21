@@ -5,7 +5,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-group = "xyz.mizarc"
+group = "dev.mizarc"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -42,10 +42,10 @@ dependencies {
 }
 
 tasks.shadowJar {
-    relocate("co.aikar.commands", "xyz.mizarc.worldwidewarps.acf")
-    relocate("co.aikar.locales", "xyz.mizarc.worldwidewarps.locales")
-    relocate("co.aikar.idb", "xyz.mizarc.worldwidewarps.idb")
-    relocate ("com.github.stefvanschie.inventoryframework", "xyz.mizarc.worldwidewarps.inventoryframework")
+    relocate("co.aikar.commands", "dev.mizarc.worldwidewarps.acf")
+    relocate("co.aikar.locales", "dev.mizarc.worldwidewarps.locales")
+    relocate("co.aikar.idb", "dev.mizarc.worldwidewarps.idb")
+    relocate ("com.github.stefvanschie.inventoryframework", "dev.mizarc.worldwidewarps.inventoryframework")
 }
 
 tasks.test {
