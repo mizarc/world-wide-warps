@@ -6,8 +6,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import dev.mizarc.worldwidewarps.HomeRepository
 import dev.mizarc.worldwidewarps.Position
+import org.bukkit.block.Block
+import org.bukkit.event.block.BlockExplodeEvent
+import org.bukkit.event.entity.EntityExplodeEvent
 
-class                                                                                                                                                                                                                                 BedDestructionListener(val homes: HomeRepository): Listener {
+class BedDestructionListener(val homes: HomeRepository): Listener {
 
     @EventHandler
     fun onBedDestroy(event: BlockBreakEvent) {
@@ -25,6 +28,23 @@ class                                                                           
 
         home = homes.getByPosition(Position(otherHalf.location))
         if (home != null) {
+            homes.remove(home)
+        }
+    }
+
+    @EventHandler
+    fun onBlockExplode(event: BlockExplodeEvent) {
+        explosionHandler(event.blockList())
+    }
+
+    @EventHandler
+    fun onEntityExplode(event: EntityExplodeEvent) {
+        explosionHandler(event.blockList())
+    }
+
+    fun explosionHandler(blocks: MutableList<Block>) {
+        for (block in blocks) {
+            val home = homes.getByPosition(Position(block.location)) ?: continue
             homes.remove(home)
         }
     }
