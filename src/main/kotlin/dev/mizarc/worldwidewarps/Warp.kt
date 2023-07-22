@@ -4,6 +4,7 @@ import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.bukkit.entity.Player
+import java.time.Instant
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -16,8 +17,8 @@ import kotlin.concurrent.thread
  * @property position The position in the world.
  * @property direction The facing direction
  */
-data class Warp(val id: UUID, val player: OfflinePlayer, var name: String, var world: World,
-           var position: Position, var direction: Direction, var icon: Material) {
+data class Warp(val id: UUID, val player: OfflinePlayer, val creationTime: Instant, var name: String, var world: World,
+                var position: Position, var direction: Direction, var icon: Material) {
     val defaultBreakCount = 3
     var breakCount = 3
     var breakPeriod = false
@@ -31,10 +32,10 @@ data class Warp(val id: UUID, val player: OfflinePlayer, var name: String, var w
      */
     constructor(player: OfflinePlayer, name: String, world: World, position: Position,
                 direction: Direction, icon: Material):
-            this(UUID.randomUUID(), player, name, world, position, direction, icon)
+            this(UUID.randomUUID(), player, Instant.now(), name, world, position, direction, icon)
 
     constructor(builder: Builder):
-            this(UUID.randomUUID(), builder.player, builder.name, builder.world,
+            this(UUID.randomUUID(), builder.player, Instant.now(), builder.name, builder.world,
                 builder.position, builder.direction, builder.icon)
 
     class Builder(val player: Player, val world: World, val position: Position) {
