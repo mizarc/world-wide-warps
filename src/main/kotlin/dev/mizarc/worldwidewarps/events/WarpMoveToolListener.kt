@@ -19,8 +19,9 @@ class WarpMoveToolListener(private val warpRepo: WarpRepository): Listener {
     fun onWarpMoveBlockPlace(event: BlockPlaceEvent) {
         val warpId = event.itemInHand.getStringMeta("warp")
         val warp = warpRepo.getById(UUID.fromString(warpId)) ?: return
+        val world = warp.getWorld() ?: return
 
-        val existingLocation = Location(warp.world,
+        val existingLocation = Location(world,
             warp.position.x.toDouble(), warp.position.y.toDouble(), warp.position.z.toDouble())
         val existingBlock = existingLocation.block
         existingBlock.breakNaturally(ItemStack(Material.WOODEN_HOE))

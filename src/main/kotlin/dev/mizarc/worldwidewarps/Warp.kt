@@ -1,5 +1,6 @@
 package dev.mizarc.worldwidewarps
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
@@ -17,7 +18,7 @@ import kotlin.concurrent.thread
  * @property position The position in the world.
  * @property direction The facing direction
  */
-data class Warp(val id: UUID, val player: OfflinePlayer, val creationTime: Instant, var name: String, var world: World,
+data class Warp(val id: UUID, val player: OfflinePlayer, val creationTime: Instant, var name: String, var worldId: UUID,
                 var position: Position, var direction: Direction, var icon: Material) {
     val defaultBreakCount = 3
     var breakCount = 3
@@ -30,13 +31,17 @@ data class Warp(val id: UUID, val player: OfflinePlayer, val creationTime: Insta
      * @param world The world the warp is in.
      * @param position The position in the world.
      */
-    constructor(player: OfflinePlayer, name: String, world: World, position: Position,
+    constructor(player: OfflinePlayer, name: String, worldId: UUID, position: Position,
                 direction: Direction, icon: Material):
-            this(UUID.randomUUID(), player, Instant.now(), name, world, position, direction, icon)
+            this(UUID.randomUUID(), player, Instant.now(), name, worldId, position, direction, icon)
 
     constructor(builder: Builder):
-            this(UUID.randomUUID(), builder.player, Instant.now(), builder.name, builder.world,
+            this(UUID.randomUUID(), builder.player, Instant.now(), builder.name, builder.world.uid,
                 builder.position, builder.direction, builder.icon)
+
+    fun getWorld(): World? {
+        return Bukkit.getWorld(worldId)
+    }
 
     class Builder(val player: Player, val world: World, val position: Position) {
         var name = "Warp"

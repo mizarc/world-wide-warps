@@ -190,7 +190,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
             val newHome = Home(editingHome.id, editingHome.player,
-                gui.renameText, editingHome.colour, editingHome.world, editingHome.position, editingHome.direction)
+                gui.renameText, editingHome.colour, editingHome.worldId, editingHome.position, editingHome.direction)
             homes.update(newHome)
             openHomeEditMenu(homeBuilder, editingHome)
             guiEvent.isCancelled = true
@@ -222,12 +222,13 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
 
     private fun teleportToBed(player: Player, home: Home) {
         // Set player's view to align with the bed
-        val sleepingLocation = Location(home.world, home.position.x.toDouble(), home.position.y.toDouble(), home.position.z.toDouble())
+        val sleepingLocation = Location(home.getWorld(), home.position.x.toDouble(), home.position.y.toDouble(), home.position.z.toDouble())
         val bed = sleepingLocation.block.blockData as Bed
         val direction = Direction.fromVector(bed.facing.oppositeFace.direction)
-        player.teleport(Location(home.world, home.position.x.toDouble(), home.position.y.toDouble() + 1, home.position.z.toDouble(), Direction.toYaw(direction), 0.0f))
+        val world = home.getWorld() ?: return
+        player.teleport(Location(home.getWorld(), home.position.x.toDouble(), home.position.y.toDouble() + 1, home.position.z.toDouble(), Direction.toYaw(direction), 0.0f))
         GSitAPI.createPose(sleepingLocation.block, player, Pose.SLEEPING,
             0.0, 0.0, 0.0, Direction.toYaw(home.direction), true)
-        player.bedSpawnLocation = home.position.toLocation(home.world)
+        player.bedSpawnLocation = home.position.toLocation(world)
     }
 }

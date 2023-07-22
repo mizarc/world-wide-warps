@@ -4,31 +4,15 @@ import co.aikar.idb.Database
 import org.bukkit.Bukkit
 import org.bukkit.DyeColor
 import org.bukkit.OfflinePlayer
+import java.sql.SQLException
 import java.util.*
 
-class HomeRepository(private val database: Database, private val players: PlayerRepository) {
+class HomeRepository(private val database: Database) {
     private val homes: MutableMap<UUID, Home> = mutableMapOf()
 
-    fun init() {
-        database.executeUpdate("CREATE TABLE IF NOT EXISTS homes (id TEXT, playerId TEXT, name TEXT, " +
-                "colour TEXT, worldId TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER, " +
-                "direction INT);")
-
-        val results = database.getResults("SELECT * FROM homes;")
-        for (result in results) {
-            homes[UUID.fromString(result.getString("id"))] = (Home(
-                UUID.fromString(result.getString("id")),
-                Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
-                result.getString("name"),
-                DyeColor.valueOf(result.getString("colour")),
-                Bukkit.getWorld(UUID.fromString(result.getString("worldId"))) ?: continue,
-                Position(
-                    result.getInt("positionX"),
-                    result.getInt("positionY"),
-                    result.getInt("positionZ")),
-                Direction.values()[result.getInt("direction")]
-            ))
-        }
+    init {
+        createTable()
+        preload()
     }
 
     fun getAll(): List<Home> {
@@ -47,7 +31,7 @@ class HomeRepository(private val database: Database, private val players: Player
         homes[home.id] = home
         database.executeInsert("INSERT INTO homes (id, playerId, name, colour, worldId, " +
                 "positionX, positionY, positionZ, direction) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            home.id, home.player.uniqueId, home.name, home.colour, home.world.uid,
+            home.id, home.player.uniqueId, home.name, home.colour, home.worldId,
             home.position.x, home.position.y, home.position.z, home.direction.ordinal)
     }
 
@@ -56,7 +40,7 @@ class HomeRepository(private val database: Database, private val players: Player
         homes[home.id] = home
         database.executeUpdate("UPDATE homes SET playerId=?, name=?, colour=?, worldId=?, " +
                 "positionX=?, positionY=?, positionZ=?, direction=? WHERE id=?",
-            home.player.uniqueId, home.name, home.colour, home.world.uid,
+            home.player.uniqueId, home.name, home.colour, home.worldId,
             home.position.x, home.position.y, home.position.z, home.direction.ordinal, home.id)
         return
     }
@@ -64,5 +48,37 @@ class HomeRepository(private val database: Database, private val players: Player
     fun remove(home: Home) {
         homes.remove(home.id)
         database.executeUpdate("DELETE FROM homes WHERE id=?", home.id)
+    }
+
+    private fun createTable() {
+        try {
+            database.executeUpdate("CREATE TABLE IF NOT EXISTS homes (id TEXT, playerId TEXT, name TEXT, " +
+                    "colour TEXT, worldId TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER, " +
+                    "direction INT);")
+        } catch (error: SQLException) {
+            error.printStackTrace()
+        }
+    }
+
+    private fun preload() {
+        try {
+            val results = database.getResults("SELECT * FROM homes;")
+            for (result in results) {
+                homes[UUID.fromString(result.getString("id"))] = Home(
+                    UUID.fromString(result.getString("id")),
+                    Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
+                    result.getString("name"),
+                    DyeColor.valueOf(result.getString("colour")),
+                    UUID.fromString(result.getString("worldId")),
+                    Position(
+                        result.getInt("positionX"),
+                        result.getInt("positionY"),
+                        result.getInt("positionZ")),
+                    Direction.values()[result.getInt("direction")]
+                )
+            }
+        } catch (error: SQLException) {
+            error.printStackTrace()
+        }
     }
 }

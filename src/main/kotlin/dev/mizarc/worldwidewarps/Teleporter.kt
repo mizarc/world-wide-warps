@@ -69,7 +69,8 @@ class Teleporter(private val plugin: Plugin, private val config: Config, private
     }
 
     fun teleportWarp(player: Player, warp: Warp): Boolean {
-        val warpLocation = warp.position.toLocation(warp.world)
+        val world = warp.getWorld() ?: return false
+        val warpLocation = warp.position.toLocation(world)
         warpLocation.x += 0.5
         warpLocation.y += 1
         warpLocation.z += 0.5
