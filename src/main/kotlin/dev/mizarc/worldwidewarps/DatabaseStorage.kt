@@ -9,7 +9,7 @@ class DatabaseStorage(plugin: Plugin) {
     val connection: Database
 
     init {
-        val options = DatabaseOptions.builder().sqlite(plugin.dataFolder.toString() + "/homes.db").build()
+        val options = DatabaseOptions.builder().sqlite(plugin.dataFolder.toString() + "/warps.db").build()
         connection = PooledDatabaseOptions.builder().options(options).createHikariDatabase()
     }
 }
