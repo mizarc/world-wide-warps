@@ -17,7 +17,7 @@ class WarpMenuCommand: BaseCommand() {
     @Dependency lateinit var warpRepository: WarpRepository
 
     @Default
-    fun onWarp(player: Player) {
-        WarpMenu(warpRepository, teleporter, player).openWarpMenu()
+    fun onWarp(player: Player, backCommand: String? = null) {
+        WarpMenu(warpRepository, teleporter, player).openWarpMenu(backCommand)
     }
 }
