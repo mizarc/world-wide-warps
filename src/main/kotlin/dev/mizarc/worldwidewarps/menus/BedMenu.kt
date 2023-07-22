@@ -62,22 +62,23 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
         // Add existing homes to menu
         val playerHomes = homes.getByPlayer(playerState.player)
         if (playerHomes.isNotEmpty()) {
-            for (i in 0 until playerHomes.count()) {
-                val home = playerHomes[i]
+            var lastIndex = 0
+            for (home in playerHomes) {
                 if (home.position == homeBuilder.position) {
                     continue
                 }
 
                 val bedItem = ItemStack(home.colour.toBed())
-                    .name(playerHomes[i].name)
+                    .name(home.name)
                     .lore("Teleports to bed at ${home.position.x}, ${home.position.y}, ${home.position.z}.")
                 val guiBedItem = GuiItem(bedItem) { _ ->
                     playerState.inBedMenu = false
                     GSitAPI.removePose(homeBuilder.player, GetUpReason.GET_UP)
                     teleportToBed(homeBuilder.player, home)
                 }
-                pane.addItem(guiBedItem, i + 2, 0)
-                lastPaneEntry = i + 2
+                pane.addItem(guiBedItem, lastIndex + 2, 0)
+                lastPaneEntry = lastIndex + 2
+                lastIndex += 1
             }
         }
 
