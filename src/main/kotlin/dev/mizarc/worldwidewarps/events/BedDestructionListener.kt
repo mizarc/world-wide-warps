@@ -7,7 +7,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import dev.mizarc.worldwidewarps.HomeRepository
 import dev.mizarc.worldwidewarps.Position
 
-class                                                                                                                                                                                                                                 BedDestructionListener(val homes: HomeRepository): Listener {
+class BedDestructionListener(val homes: HomeRepository): Listener {
 
     @EventHandler
     fun onBedDestroy(event: BlockBreakEvent) {
