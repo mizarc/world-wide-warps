@@ -7,6 +7,8 @@ import org.bukkit.World
 import org.bukkit.block.data.type.Bed
 import org.bukkit.entity.Player
 import dev.mizarc.worldwidewarps.utils.getColour
+import org.bukkit.Bukkit
+import java.time.Instant
 import java.util.*
 
 /**
@@ -17,8 +19,8 @@ import java.util.*
  * @property colour The colour of the bed.
  * @property position The position in the world.
  */
-class Home(val id: UUID, val player: OfflinePlayer, val name: String, val colour: DyeColor, val world: World,
-           val position: Position, val direction: Direction) {
+class Home(val id: UUID, val player: OfflinePlayer, val creationTime: Instant, val name: String, val colour: DyeColor,
+           val worldId: UUID, val position: Position, val direction: Direction) {
 
     /**
      * Used to create a new home instance with an auto generated UUID.
@@ -28,12 +30,16 @@ class Home(val id: UUID, val player: OfflinePlayer, val name: String, val colour
      * @param position The position in the world.
      */
     constructor(player: OfflinePlayer, name: String, colour: DyeColor,
-                world: World, position: Position, direction: Direction):
-            this(UUID.randomUUID(), player, name, colour, world, position, direction)
+                worldId: UUID, position: Position, direction: Direction):
+            this(UUID.randomUUID(), player, Instant.now(), name, colour, worldId, position, direction)
 
     constructor(builder: Builder):
-            this(UUID.randomUUID(), builder.player, builder.name, builder.bed.getColour(),
-                builder.world, builder.position, builder.direction)
+            this(UUID.randomUUID(), builder.player, Instant.now(), builder.name, builder.bed.getColour(),
+                builder.world.uid, builder.position, builder.direction)
+
+    fun getWorld(): World? {
+        return Bukkit.getWorld(worldId)
+    }
 
     class Builder(val player: Player, val world: World, val position: Position, val bed: Bed) {
         var name = ""

@@ -16,7 +16,7 @@ class WorldWideWarps: JavaPlugin() {
     private val config = Config(this)
     private val storage = DatabaseStorage(this)
     val players = PlayerRepository()
-    val homeRepository = HomeRepository(storage.connection, players)
+    val homeRepository = HomeRepository(storage.connection)
     val warpRepository = WarpRepository(storage.connection)
     val warpAccessRepository = WarpAccessRepository(storage.connection, warpRepository)
     val teleporter = Teleporter(this, config, players)
@@ -27,8 +27,6 @@ class WorldWideWarps: JavaPlugin() {
         metadata = serviceProvider.provider
         commandManager = PaperCommandManager(this)
         dataFolder.mkdir()
-        homeRepository.init()
-        warpRepository.init()
         warpAccessRepository.init()
         registerDependencies()
         registerCommands()

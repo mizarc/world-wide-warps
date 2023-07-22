@@ -1,9 +1,11 @@
 package dev.mizarc.worldwidewarps
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.bukkit.entity.Player
+import java.time.Instant
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -16,8 +18,8 @@ import kotlin.concurrent.thread
  * @property position The position in the world.
  * @property direction The facing direction
  */
-data class Warp(val id: UUID, val player: OfflinePlayer, var name: String, var world: World,
-           var position: Position, var direction: Direction, var icon: Material) {
+data class Warp(val id: UUID, val player: OfflinePlayer, val creationTime: Instant, var name: String, var worldId: UUID,
+                var position: Position, var direction: Direction, var icon: Material) {
     val defaultBreakCount = 3
     var breakCount = 3
     var breakPeriod = false
@@ -29,13 +31,17 @@ data class Warp(val id: UUID, val player: OfflinePlayer, var name: String, var w
      * @param world The world the warp is in.
      * @param position The position in the world.
      */
-    constructor(player: OfflinePlayer, name: String, world: World, position: Position,
+    constructor(player: OfflinePlayer, name: String, worldId: UUID, position: Position,
                 direction: Direction, icon: Material):
-            this(UUID.randomUUID(), player, name, world, position, direction, icon)
+            this(UUID.randomUUID(), player, Instant.now(), name, worldId, position, direction, icon)
 
     constructor(builder: Builder):
-            this(UUID.randomUUID(), builder.player, builder.name, builder.world,
+            this(UUID.randomUUID(), builder.player, Instant.now(), builder.name, builder.world.uid,
                 builder.position, builder.direction, builder.icon)
+
+    fun getWorld(): World? {
+        return Bukkit.getWorld(worldId)
+    }
 
     class Builder(val player: Player, val world: World, val position: Position) {
         var name = "Warp"
