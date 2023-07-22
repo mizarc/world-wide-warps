@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/WorldWideWarps.main.iml" filepath="$PROJECT_DIR$/.idea/modules/WorldWideWarps.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/WorldWideWarps.test.iml" filepath="$PROJECT_DIR$/.idea/modules/WorldWideWarps.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xyz.mizarc.WorldWideWarps.main.iml" filepath="$PROJECT_DIR$/.idea/modules/xyz.mizarc.WorldWideWarps.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dev.mizarc.WorldWideWarps.main.iml" filepath="$PROJECT_DIR$/.idea/modules/dev.mizarc.WorldWideWarps.main.iml" />
     </modules>
   </component>
 </project>

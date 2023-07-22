@@ -9,15 +9,14 @@ import com.github.stefvanschie.inventoryframework.gui.type.FurnaceGui
 import com.github.stefvanschie.inventoryframework.gui.type.HopperGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import com.github.stefvanschie.inventoryframework.pane.component.Label
+import dev.mizarc.worldwidewarps.*
+import dev.mizarc.worldwidewarps.utils.getWarpMoveTool
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import dev.mizarc.worldwidewarps.Direction
-import dev.mizarc.worldwidewarps.Warp
-import dev.mizarc.worldwidewarps.WarpAccessRepository
-import dev.mizarc.worldwidewarps.WarpRepository
 import dev.mizarc.worldwidewarps.utils.lore
 import dev.mizarc.worldwidewarps.utils.name
+import org.bukkit.entity.Player
 import kotlin.concurrent.thread
 
 class WarpManagementMenu(private val warpRepository: WarpRepository,
@@ -36,6 +35,8 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
 
     fun openWarpCreationMenu() {
         val gui = ChestGui(1, "Warp Creation")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
+
         val pane = StaticPane(0, 0, 9, 1)
         gui.addPane(pane)
 
@@ -51,6 +52,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
     fun openWarpNamingMenu(existing_name: Boolean = false) {
         // Create homes menu
         val gui = AnvilGui("Naming Warp")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
 
         // Add lodestone menu item
         val firstPane = StaticPane(0, 0, 1, 1)
@@ -92,22 +94,31 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
 
     fun openWarpEditMenu(warp: Warp) {
         val gui = ChestGui(1, "Warp '${warp.name}'")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
+
         val pane = StaticPane(0, 0, 9, 1)
         gui.addPane(pane)
+
+        // Add player count icon
+        val playerCountItem = ItemStack(Material.PLAYER_HEAD)
+            .name("Player Count:")
+            .lore("${warpAccessRepository.getByWarp(warp).count()}")
+        val guiPlayerCountItem = GuiItem(playerCountItem) { guiEvent -> guiEvent.isCancelled = true }
+        pane.addItem(guiPlayerCountItem, 0, 0)
 
         // Add icon editor button
         val iconEditorItem = ItemStack(warp.icon)
             .name("Edit Warp Icon")
             .lore("Changes the icon that shows up on the warp list")
         val guiIconEditorItem = GuiItem(iconEditorItem) { openWarpIconMenu(warp) }
-        pane.addItem(guiIconEditorItem, 0, 0)
+        pane.addItem(guiIconEditorItem, 2, 0)
 
         // Add renaming icon
         val renamingItem = ItemStack(Material.NAME_TAG)
             .name("Rename Warp")
             .lore("Renames this warp")
         val guiRenamingItem = GuiItem(renamingItem) { openWarpRenamingMenu(warp) }
-        pane.addItem(guiRenamingItem, 2, 0)
+        pane.addItem(guiRenamingItem, 3, 0)
 
         // Add direction icon
         val directionItem = ItemStack(Material.COMPASS)
@@ -116,12 +127,12 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         val guiDirectionItem = GuiItem(directionItem) { openWarpDirectionMenu(warp) }
         pane.addItem(guiDirectionItem, 4, 0)
 
-        // Add player count icon
-        val playerCountItem = ItemStack(Material.PLAYER_HEAD)
-            .name("Player Count:")
-            .lore("${warpAccessRepository.getByWarp(warp).count()}")
-        val guiPlayerCountItem = GuiItem(playerCountItem) { guiEvent -> guiEvent.isCancelled = true }
-        pane.addItem(guiPlayerCountItem, 6, 0)
+        // Add move icon
+        val moveItem = ItemStack(Material.PISTON)
+            .name("Move Warp")
+            .lore("Place the provided item where you want to move the warp")
+        val guiMoveItem = GuiItem(moveItem) { givePlayerMoveTool(warpBuilder.player, warp) }
+        pane.addItem(guiMoveItem, 7, 0)
 
         // Add warp delete icon
         val deleteItem = ItemStack(Material.REDSTONE)
@@ -134,6 +145,8 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
 
     fun openWarpIconMenu(warp: Warp) {
         val gui = FurnaceGui("Set Warp Icon")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
+
         val fuelPane = StaticPane(0, 0, 1, 1)
 
         // Add info paper menu item
@@ -191,6 +204,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
     fun openWarpRenamingMenu(warp: Warp, existingName: Boolean = false) {
         // Create homes menu
         val gui = AnvilGui("Renaming Warp")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
 
         // Add lodestone menu item
         val firstPane = StaticPane(0, 0, 1, 1)
@@ -239,6 +253,7 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
 
     fun openWarpDirectionMenu(warp: Warp) {
         val gui = DispenserGui("Select Direction")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
 
         // Add North item
         val northLabel = Label(1, 0, 1, 1, Font.QUARTZ)
@@ -305,6 +320,8 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
 
     fun openWarpDeleteMenu(warp: Warp) {
         val gui = HopperGui("Delete Warp?")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
+
         val pane = StaticPane(1, 0, 3, 1)
         gui.slotsComponent.addPane(pane)
 
@@ -331,5 +348,15 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
         pane.addItem(guiYesItem, 2, 0)
 
         gui.show(warpBuilder.player)
+    }
+
+    private fun givePlayerMoveTool(player: Player, warp: Warp) {
+        for (item in player.inventory.contents!!) {
+            if (item == null) continue
+            if (item.itemMeta != null && item.itemMeta == getWarpMoveTool(warp).itemMeta) {
+                return
+            }
+        }
+        player.inventory.addItem(getWarpMoveTool(warp))
     }
 }
