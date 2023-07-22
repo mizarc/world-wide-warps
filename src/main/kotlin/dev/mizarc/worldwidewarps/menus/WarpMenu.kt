@@ -19,6 +19,7 @@ class WarpMenu(private val warpRepository: WarpRepository, private val teleporte
     fun openWarpMenu() {
         val warps = warpRepository.getByPlayer(player)
         val gui = ChestGui(6, "Warps")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
 
         // Add controls pane
         val controlsPane = StaticPane(0, 0, 9, 1)

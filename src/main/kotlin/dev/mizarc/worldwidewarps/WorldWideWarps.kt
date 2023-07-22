@@ -62,5 +62,7 @@ class WorldWideWarps: JavaPlugin() {
         server.pluginManager.registerEvents(BedDestructionListener(homeRepository), this)
         server.pluginManager.registerEvents(WarpInteractListener(warpRepository, warpAccessRepository), this)
         server.pluginManager.registerEvents(WarpDestructionListener(warpRepository, warpAccessRepository), this)
+        server.pluginManager.registerEvents(WarpMoveToolListener(warpRepository), this)
+        server.pluginManager.registerEvents(WarpMoveToolRemovalListener(), this)
     }
 }

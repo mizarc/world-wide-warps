@@ -24,6 +24,8 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
     fun openHomeSelectionMenu() {
         // Create homes menu
         val gui = ChestGui(1, "Homes")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
+
         val pane = StaticPane(0, 0, 9, 1)
         gui.addPane(pane)
         var lastPaneEntry = 1
@@ -110,6 +112,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
     fun openHomeCreationMenu(homeBuilder: Home.Builder) {
         // Create homes menu
         val gui = AnvilGui("Name your home")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
 
         // Add bed menu item
         val firstPane = StaticPane(0, 0, 1, 1)
@@ -138,6 +141,8 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
             WordUtils.capitalizeFully(editingHome.colour.toBed().name.replace("_", " "))
         }
         val gui = ChestGui(1, "Editing $name")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
+
         val pane = StaticPane(0, 0, 9, 1)
         gui.addPane(pane)
 
@@ -169,6 +174,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
     fun openHomeRenameMenu(homeBuilder: Home.Builder, editingHome: Home) {
         // Create homes menu
         val gui = AnvilGui("Renaming ${editingHome.name}")
+        gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
 
         // Add bed menu item
         val firstPane = StaticPane(0, 0, 1, 1)
