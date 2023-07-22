@@ -190,7 +190,7 @@ class BedMenu(private val homes: HomeRepository, private val playerState: Player
         val secondPane = StaticPane(0, 0, 1, 1)
         val confirmItem = ItemStack(Material.NETHER_STAR).name("Confirm")
         val confirmGuiItem = GuiItem(confirmItem) { guiEvent ->
-            val newHome = Home(editingHome.id, editingHome.player,
+            val newHome = Home(editingHome.id, editingHome.player, editingHome.creationTime,
                 gui.renameText, editingHome.colour, editingHome.worldId, editingHome.position, editingHome.direction)
             homes.update(newHome)
             openHomeEditMenu(homeBuilder, editingHome)

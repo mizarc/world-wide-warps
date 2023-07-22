@@ -5,6 +5,7 @@ import org.bukkit.Bukkit
 import org.bukkit.DyeColor
 import org.bukkit.OfflinePlayer
 import java.sql.SQLException
+import java.time.Instant
 import java.util.*
 
 class HomeRepository(private val database: Database) {
@@ -29,18 +30,18 @@ class HomeRepository(private val database: Database) {
 
     fun add(home: Home) {
         homes[home.id] = home
-        database.executeInsert("INSERT INTO homes (id, playerId, name, colour, worldId, " +
-                "positionX, positionY, positionZ, direction) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            home.id, home.player.uniqueId, home.name, home.colour, home.worldId,
+        database.executeInsert("INSERT INTO homes (id, playerId, creationTime, name, colour, worldId, " +
+                "positionX, positionY, positionZ, direction) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+            home.id, home.player.uniqueId, home.creationTime, home.name, home.colour, home.worldId,
             home.position.x, home.position.y, home.position.z, home.direction.ordinal)
     }
 
     fun update(home: Home) {
         homes.remove(home.id)
         homes[home.id] = home
-        database.executeUpdate("UPDATE homes SET playerId=?, name=?, colour=?, worldId=?, " +
+        database.executeUpdate("UPDATE homes SET playerId=?, creationTime=?, name=?, colour=?, worldId=?, " +
                 "positionX=?, positionY=?, positionZ=?, direction=? WHERE id=?",
-            home.player.uniqueId, home.name, home.colour, home.worldId,
+            home.player.uniqueId, home.creationTime, home.name, home.colour, home.worldId,
             home.position.x, home.position.y, home.position.z, home.direction.ordinal, home.id)
         return
     }
@@ -52,9 +53,9 @@ class HomeRepository(private val database: Database) {
 
     private fun createTable() {
         try {
-            database.executeUpdate("CREATE TABLE IF NOT EXISTS homes (id TEXT, playerId TEXT, name TEXT, " +
-                    "colour TEXT, worldId TEXT, positionX INTEGER, positionY INTEGER, positionZ INTEGER, " +
-                    "direction INT);")
+            database.executeUpdate("CREATE TABLE IF NOT EXISTS homes (id TEXT, playerId TEXT, " +
+                    "creationTime TEXT, name TEXT, colour TEXT, worldId TEXT, positionX INTEGER, positionY INTEGER, " +
+                    "positionZ INTEGER, direction INT);")
         } catch (error: SQLException) {
             error.printStackTrace()
         }
@@ -67,6 +68,7 @@ class HomeRepository(private val database: Database) {
                 homes[UUID.fromString(result.getString("id"))] = Home(
                     UUID.fromString(result.getString("id")),
                     Bukkit.getOfflinePlayer(UUID.fromString(result.getString("playerId"))),
+                    Instant.parse(result.getString("creationTime")),
                     result.getString("name"),
                     DyeColor.valueOf(result.getString("colour")),
                     UUID.fromString(result.getString("worldId")),
