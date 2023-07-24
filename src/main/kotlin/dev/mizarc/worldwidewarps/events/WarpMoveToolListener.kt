@@ -17,7 +17,7 @@ class WarpMoveToolListener(private val warpRepo: WarpRepository): Listener {
 
     @EventHandler
     fun onWarpMoveBlockPlace(event: BlockPlaceEvent) {
-        val warpId = event.itemInHand.getStringMeta("warp")
+        val warpId = event.itemInHand.getStringMeta("warp") ?: return
         val warp = warpRepo.getById(UUID.fromString(warpId)) ?: return
         val world = warp.getWorld() ?: return
 
