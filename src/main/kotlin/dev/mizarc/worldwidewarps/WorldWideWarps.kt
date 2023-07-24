@@ -44,6 +44,7 @@ class WorldWideWarps: JavaPlugin() {
         commandManager.registerDependency(PlayerRepository::class.java, players)
         commandManager.registerDependency(Teleporter::class.java, teleporter)
         commandManager.registerDependency(WarpRepository::class.java, warpRepository)
+        commandManager.registerDependency(WarpAccessRepository::class.java, warpAccessRepository)
     }
 
     private fun registerCommands() {

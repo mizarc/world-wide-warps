@@ -8,17 +8,18 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import dev.mizarc.worldwidewarps.Teleporter
+import dev.mizarc.worldwidewarps.WarpAccessRepository
 import dev.mizarc.worldwidewarps.WarpRepository
 import dev.mizarc.worldwidewarps.utils.lore
 import dev.mizarc.worldwidewarps.utils.name
 import kotlin.math.ceil
 
-class WarpMenu(private val warpRepository: WarpRepository, private val teleporter: Teleporter,
+class WarpMenu(private val warpAccessRepository: WarpAccessRepository, private val teleporter: Teleporter,
                private val player: Player) {
     var page = 1
 
     fun openWarpMenu(backCommand: String? = null) {
-        val warps = warpRepository.getByPlayer(player)
+        val warps = warpAccessRepository.getByPlayer(player)
         val gui = ChestGui(6, "Warps")
         gui.setOnTopClick { guiEvent -> guiEvent.isCancelled = true }
 
