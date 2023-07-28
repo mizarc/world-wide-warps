@@ -18,7 +18,6 @@ class WarpDestructionListener(val warpRepository: WarpRepository,
                               val warpAccessRepository: WarpAccessRepository): Listener {
     @EventHandler
     fun onWarpBreak(event: BlockBreakEvent) {
-        Bukkit.getLogger().info("oof")
         if (event.block.type != Material.LODESTONE) return
         val warp = warpRepository.getAll().find { it.position == Position(event.block.location) } ?: return
 
