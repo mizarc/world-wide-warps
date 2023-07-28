@@ -30,6 +30,8 @@ class WarpManagementMenu(private val warpRepository: WarpRepository,
             return
         }
 
+        if (existingWarp.player.uniqueId != warpBuilder.player.uniqueId) return
+
         openWarpEditMenu(existingWarp)
     }
 

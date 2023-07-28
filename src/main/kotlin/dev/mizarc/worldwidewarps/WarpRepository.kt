@@ -80,9 +80,5 @@ class WarpRepository(private val database: Database) {
                 Direction.values()[result.getInt("direction")],
                 Material.valueOf(result.getString("icon")))
         }
-
-        for (warp in warps.values) {
-            Bukkit.getLogger().info("deepy $warp")
-        }
     }
 }
