@@ -20,11 +20,13 @@ class WarpInteractListener(var warpRepository: WarpRepository,
 
         val existingWarp = warpRepository.getAll().find { it.position == Position(event.clickedBlock!!.location) }
         if (event.player.isSneaking) {
+            if (!event.player.hasPermission("worldwidewarps.action.warp_manage")) return
             val warpBuilder = Warp.Builder(event.player, event.clickedBlock!!.location.world, Position(event.clickedBlock!!.location))
             WarpManagementMenu(warpRepository, warpAccessRepository, warpBuilder).openWarpManagementMenu()
         }
         if (existingWarp == null) return
 
+        if (!event.player.hasPermission("worldwidewarps.action.warp_unlock")) return
         if (!warpAccessRepository.hasAccess(event.player, existingWarp)) {
             warpAccessRepository.addWarpForPlayer(event.player, existingWarp)
             event.player.sendActionBar(
