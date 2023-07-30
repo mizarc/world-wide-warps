@@ -1,4 +1,4 @@
-package dev.mizarc.worldwidewarps.events
+package dev.mizarc.worldwidewarps.listeners
 
 import dev.mizarc.worldwidewarps.utils.getStringMeta
 import org.bukkit.Material

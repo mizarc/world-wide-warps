@@ -1,4 +1,4 @@
-package dev.mizarc.worldwidewarps.events
+package dev.mizarc.worldwidewarps.listeners
 
 import dev.geco.gsit.api.GSitAPI
 import dev.geco.gsit.api.event.PrePlayerGetUpPoseEvent
@@ -30,7 +30,7 @@ class BedInteractListener(private val homes: HomeRepository, private val players
         }
 
         // Permission check for bed menu
-        if (!event.player.hasPermission("worldwidewarps.action.multihome")
+        if (!event.player.hasPermission("worldwidewarps.action.multi_home")
             || !event.player.isSneaking || event.bed.blockData !is Bed) {
             return
         }

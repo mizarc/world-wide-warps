@@ -1,4 +1,4 @@
-package dev.mizarc.worldwidewarps.events
+package dev.mizarc.worldwidewarps.listeners
 
 import dev.mizarc.worldwidewarps.Position
 import dev.mizarc.worldwidewarps.WarpRepository

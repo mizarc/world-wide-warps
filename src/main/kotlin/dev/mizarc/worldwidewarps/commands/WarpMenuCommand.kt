@@ -12,7 +12,7 @@ import dev.mizarc.worldwidewarps.WarpRepository
 import dev.mizarc.worldwidewarps.menus.WarpMenu
 
 @CommandAlias("warpmenu")
-@CommandPermission("worldwidewarps.command.warp")
+@CommandPermission("worldwidewarps.command.warpmenu")
 class WarpMenuCommand: BaseCommand() {
     @Dependency lateinit var teleporter: Teleporter
     @Dependency lateinit var warpAccessRepo: WarpAccessRepository
