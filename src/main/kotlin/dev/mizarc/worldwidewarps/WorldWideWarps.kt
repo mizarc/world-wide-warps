@@ -8,7 +8,7 @@ import dev.mizarc.worldwidewarps.commands.HomeCommand
 import dev.mizarc.worldwidewarps.commands.SetspawnCommand
 import dev.mizarc.worldwidewarps.commands.SpawnCommand
 import dev.mizarc.worldwidewarps.commands.WarpMenuCommand
-import dev.mizarc.worldwidewarps.events.*
+import dev.mizarc.worldwidewarps.listeners.*
 
 class WorldWideWarps: JavaPlugin() {
     private lateinit var commandManager: PaperCommandManager

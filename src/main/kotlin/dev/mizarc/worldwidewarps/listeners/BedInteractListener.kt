@@ -1,4 +1,4 @@
-package dev.mizarc.worldwidewarps.events
+package dev.mizarc.worldwidewarps.listeners
 
 import dev.geco.gsit.api.GSitAPI
 import dev.geco.gsit.api.event.PrePlayerGetUpPoseEvent

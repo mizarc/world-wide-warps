@@ -1,4 +1,4 @@
-package dev.mizarc.worldwidewarps.events
+package dev.mizarc.worldwidewarps.listeners
 
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -9,7 +9,6 @@ import dev.mizarc.worldwidewarps.WarpAccessRepository
 import dev.mizarc.worldwidewarps.WarpRepository
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
-import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockExplodeEvent
 import org.bukkit.event.entity.EntityExplodeEvent

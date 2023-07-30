@@ -1,4 +1,4 @@
-package dev.mizarc.worldwidewarps.events
+package dev.mizarc.worldwidewarps.listeners
 
 import net.milkbowl.vault.chat.Chat
 import org.bukkit.event.EventHandler
