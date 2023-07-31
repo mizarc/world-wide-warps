@@ -93,7 +93,7 @@ class BedInteractListener(private val homes: HomeRepository, private val players
 
         for (location in checkLocations) {
             val block = location.block
-            if (block.type != Material.AIR) {
+            if (block.type != Material.AIR && block.type != Material.CAVE_AIR) {
                 return true
             }
         }
