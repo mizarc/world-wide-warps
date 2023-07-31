@@ -1,4 +1,4 @@
-package dev.mizarc.worldwidewarps.events
+package dev.mizarc.worldwidewarps.listeners
 
 import org.bukkit.block.data.type.Bed
 import org.bukkit.event.EventHandler
