@@ -9,23 +9,30 @@ class PlayerState(val player: Player, private val config: Config, private val me
     var inBedMenu: Boolean = false
 
     fun getHomeLimit(): Int =
-        metadata.getPlayerInfoInteger(player, "home_limit", config.homeLimit).takeIf { it > -1 } ?: -1
+        metadata.getPlayerInfoInteger(player, "worldwidewarps.home_limit", config.homeLimit)
+            .takeIf { it > -1 } ?: -1
 
     fun getHomeTeleportCost(): Int =
-        metadata.getPlayerInfoInteger(player, "home_teleport_cost", config.homeCost).takeIf { it > -1 } ?: -1
+        metadata.getPlayerInfoInteger(player, "worldwidewarps.home_teleport_cost", config.homeCost)
+            .takeIf { it > -1 } ?: -1
 
     fun getHomeTeleportTimer(): Int =
-        metadata.getPlayerInfoInteger(player, "home_teleport_timer", config.homeTimer).takeIf { it > -1 } ?: -1
+        metadata.getPlayerInfoInteger(player, "worldwidewarps.home_teleport_timer", config.homeTimer)
+            .takeIf { it > -1 } ?: -1
 
     fun getSpawnTeleportCost(): Int =
-        metadata.getPlayerInfoInteger(player, "spawn_teleport_cost", config.spawnCost).takeIf { it > -1 } ?: -1
+        metadata.getPlayerInfoInteger(player, "worldwidewarps.spawn_teleport_cost", config.spawnCost)
+            .takeIf { it > -1 } ?: -1
 
     fun getSpawnTeleportTimer(): Int =
-        metadata.getPlayerInfoInteger(player, "spawn_teleport_timer", config.spawnTimer).takeIf { it > -1 } ?: -1
+        metadata.getPlayerInfoInteger(player, "worldwidewarps.spawn_teleport_timer", config.spawnTimer)
+            .takeIf { it > -1 } ?: -1
 
     fun getWarpTeleportCost(): Int =
-        metadata.getPlayerInfoInteger(player, "warp_teleport_cost", config.warpCost).takeIf { it > -1 } ?: -1
+        metadata.getPlayerInfoInteger(player, "worldwidewarps.warp_teleport_cost", config.warpCost)
+            .takeIf { it > -1 } ?: -1
 
     fun getWarpTeleportTimer(): Int =
-        metadata.getPlayerInfoInteger(player, "warp_teleport_timer", config.warpTimer).takeIf { it > -1 } ?: -1
+        metadata.getPlayerInfoInteger(player, "worldwidewarps.warp_teleport_timer", config.warpTimer)
+            .takeIf { it > -1 } ?: -1
 }
